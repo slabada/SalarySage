@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - C:\Users\lenov\OneDrive\Рабочий стол\data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+  SalarySage:
+    image: slabada228/salarysage
+    container_name: salarySage
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/SalarySage
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123

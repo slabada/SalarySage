@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee Details</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>Финансовый отчет сотрудника - <span th:text="${Employee.get().getFirstName()} + ' ' + ${Employee.get().getLastName()}"></span></h1>
+<table>
+    <tr>
+        <th>Дата выплаты</th>
+        <th>Должность</th>
+        <th>Оклад</th>
+        <th>Льготы</th>
+        <th>Налоги</th>
+        <th>Итоговая сумма</th>
+    </tr>
+    <tr th:each="prc: ${PaySheet}">
+        <td th:text="${prc.getDate()}">
+        <td th:text="${Employee.get().getPosition().getName()}">
+        <td th:text="${Employee.get().getPosition().getRate()}">
+        <td>
+            <ul>
+                <li th:each="benefit: ${prc.getBenefit()}" th:text="${benefit.name}">
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li th:each="taxRate: ${prc.getRate()}" th:text="${taxRate.name}">
+            </ul>
+        </td>
+        <td th:text="${prc.getTotalAmount()}">
+    </tr>
+</table>
+</body>
+</html>
