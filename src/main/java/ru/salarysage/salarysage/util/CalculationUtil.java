@@ -10,8 +10,16 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
+// Расчет ЗП
+
 @Component
 public class CalculationUtil {
+
+    private final float standardWorkingHours = 8f;
+
+    private final float multiplier = 2f;
+
+    private final float extraMultiplier = 1.5f;
 
     public BigDecimal calculationTotal(List<TimeSheetModel> t, PositionModel p, PaySheetModel pc) {
 
@@ -31,19 +39,49 @@ public class CalculationUtil {
         int workerDayMonth = (int) firstDayOfMonth.datesUntil(lastDayOfMonth.plusDays(1))
                 .filter(date ->
                         date.getDayOfWeek() != DayOfWeek.SATURDAY &&
-                                date.getDayOfWeek() != DayOfWeek.SUNDAY)
+                        date.getDayOfWeek() != DayOfWeek.SUNDAY)
                 .count();
 
         // Рассчитайте общее количество отработанных часов в выходные дни
-        int totalHoursWorkedWeekend = t.stream()
+        double totalHoursWorkedWeekend = t.stream()
                 .filter(TimeSheetModel::isHoliday)
-                .mapToInt(timeSheet -> timeSheet.getHoursWorked() * 2)
+                .mapToDouble(timeSheet -> {
+                    // Извлекаем часы и минуты
+                    int hoursWorked = timeSheet.getHoursWorked().toLocalTime().getHour();
+                    int minutesWorked = timeSheet.getHoursWorked().toLocalTime().getMinute();
+
+                    // Преобразуем часы в минуты для удобства дальнейших вычислений
+                    double totalMinutes = hoursWorked * 60 + minutesWorked;
+
+                    // Умножаем общее количество часов на коэффициент
+                    return totalMinutes / 60 * multiplier;
+                })
                 .sum();
 
+
         // Рассчитайте общее количество отработанных часов (не в выходные дни)
-        int totalHoursWorked = t.stream()
+        // + сверхурочные (если есть)
+        double totalHoursWorked = t.stream()
                 .filter(timeSheetModel -> !timeSheetModel.isHoliday())
-                .mapToInt(TimeSheetModel::getHoursWorked)
+                .mapToDouble(timeSheet -> {
+                    // Извлекаем часы и минуты
+                    int hoursWorked = timeSheet.getHoursWorked().toLocalTime().getHour();
+                    int minutesWorked = timeSheet.getHoursWorked().toLocalTime().getMinute();
+
+                    // Преобразуем часы в минуты для удобства дальнейших вычислений
+                    double totalMinutes = hoursWorked * 60 + minutesWorked;
+                    double totalHours = totalMinutes / 60;
+
+                    // Если отработано больше стандартного рабочего дня, считаем сверхурочные
+                    if (totalHours > standardWorkingHours) {
+                        double overtimeHours = totalHours - standardWorkingHours;
+                        // Умножаем сверхурочные на коэффициент
+                        return (standardWorkingHours + overtimeHours * extraMultiplier);
+                    } else {
+                        // Если не превышено, возвращаем обычное количество отработанных часов
+                        return totalHours;
+                    }
+                })
                 .sum();
 
         // Преобразуйте числа в BigDecimal для точных вычислений
@@ -54,16 +92,16 @@ public class CalculationUtil {
 
         // Выполните вычисления с точными BigDecimal
         BigDecimal result = ((totalHoursWorkedWeekendBD.add(totalHoursWorkedBD))
-                .divide(workerDayMonthBD.multiply(new BigDecimal(8)), MathContext.DECIMAL64)
+                .divide(workerDayMonthBD.multiply(new BigDecimal(standardWorkingHours)), MathContext.DECIMAL64)
                 .multiply(rateBD))
                 .setScale(2, RoundingMode.HALF_UP);
 
-        // Рассчитайте общий процент ставки из списка PaySheetModel
+        // Рассчитайте общий процент налога из списка PaySheetModel
         double totalPercentRate = pc.getRate().stream()
                 .mapToDouble(RateModel::getPercent)
                 .sum() / 100;
 
-        // Рассчитайте общую сумму выгоды из списка PaySheetModel
+        // Рассчитайте общую сумму льготы из списка PaySheetModel
         BigDecimal totalSumBenefit = pc.getBenefit().stream()
                 .map(BenefitModel::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -71,6 +109,6 @@ public class CalculationUtil {
         // Выполните окончательные вычисления и возвратите результат
         return result.subtract(result.subtract(totalSumBenefit)
                         .multiply(BigDecimal.valueOf(totalPercentRate)))
-                .setScale(2, RoundingMode.HALF_UP);
+                        .setScale(2, RoundingMode.HALF_UP);
     }
 }
