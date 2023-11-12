@@ -14,6 +14,7 @@ import ru.salarysage.salarysage.repository.PaySheetRepository;
 import ru.salarysage.salarysage.util.CalculationUtil;
 
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Collections;
@@ -78,7 +79,7 @@ class PaySheetServiceTest {
         t.setDate(LocalDate.parse("2023-02-02"));
         t.setNotes("test");
         t.setHoliday(false);
-        t.setHoursWorked(8);
+        t.setHoursWorked(Time.valueOf("8:00:00"));
 
         b = new BenefitModel();
 

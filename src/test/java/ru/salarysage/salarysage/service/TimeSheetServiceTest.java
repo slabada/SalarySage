@@ -15,6 +15,7 @@ import ru.salarysage.salarysage.models.TimeSheetModel;
 import ru.salarysage.salarysage.repository.TimeSheetRepository;
 
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +64,7 @@ class TimeSheetServiceTest {
         t.setDate(LocalDate.parse("2023-02-02"));
         t.setNotes("test");
         t.setHoliday(false);
-        t.setHoursWorked(8);
+        t.setHoursWorked(Time.valueOf("8:00:00"));
 
         newt = new TimeSheetModel();
 
@@ -72,7 +73,7 @@ class TimeSheetServiceTest {
         newt.setDate(LocalDate.parse("2023-02-02"));
         newt.setNotes("test");
         newt.setHoliday(false);
-        newt.setHoursWorked(8);
+        newt.setHoursWorked(Time.valueOf("8:00:00"));
     }
 
     @Test

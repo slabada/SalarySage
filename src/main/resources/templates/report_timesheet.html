@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <title>Employee Details</title>
     <style>
@@ -26,12 +26,14 @@
         <th>Дата</th>
         <th>Часы</th>
         <th>Выходной</th>
+        <th>Больничный</th>
         <th>Примечание</th>
     </tr>
     <tr th:each="prc: ${TimeSheet}">
         <td th:text="${prc.getDate()}">
         <td th:text="${prc.getHoursWorked()}">
-        <td th:text="${prc.isHoliday()}">
+        <td th:text="${prc.isHoliday() ? 'Да' : 'Нет'}"></td>
+        <td th:text="${prc.isMedical() ? 'Да' : 'Нет'}"></td>
         <td th:text="${prc.getNotes()}">
     </tr>
 </table>

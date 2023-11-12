@@ -28,5 +28,6 @@ public class TimeSheetModel {
     private EmployeeModel employeeId;
     private Time hoursWorked;
     private boolean isHoliday;
+    private boolean isMedical;
     private String notes;
 }
