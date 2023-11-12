@@ -1,0 +1,107 @@
+
+# Создание должности
+
+POST http://localhost:8080/position/create
+Content-Type: application/json
+
+{
+  "name": "Программист321",
+  "rate": 50000
+}
+
+###
+
+# Создание сотрудника
+
+POST  http://localhost:8080/employee/create
+Content-Type: application/json
+
+{
+  "firstName": "Иван",
+  "lastName": "Программистов",
+  "address": "Улица пушкина, д. колотушкина",
+  "position": {
+    "id": 1
+  }
+}
+
+###
+
+# Создание записи в табели отработонного времени
+
+POST  http://localhost:8080/timesheet/create
+Content-Type: application/json
+
+{
+  "date": "2023-11-12",
+  "hoursWorked": "08:00:00",
+  "holiday": false,
+  "medical": true,
+  "employeeId": {
+    "id": 1
+  }
+}
+
+###
+
+# Создание льготы
+
+POST  http://localhost:8080/benefit/create
+Content-Type: application/json
+
+{
+  "name": "Вычет на ребенка I",
+  "amount": 1000
+}
+
+###
+
+# Создание налога (НДФЛ создается автоманически при первом запуске)
+
+POST  http://localhost:8080/rate/create
+Content-Type: application/json
+
+{
+  "name": "НДФЛ",
+  "percent": 13
+}
+
+###
+
+# Создание расчетного листа (НДФЛ добавиться автоматически)
+
+POST  http://localhost:8080/paysheet/create
+Content-Type: application/json
+
+{
+  "year": 2023,
+  "month": 11,
+  "employeeId":{
+    "id":1
+  }
+}
+
+###
+
+# Создание расчетного листа с льготой
+
+POST  http://localhost:8080/paysheet/create
+Content-Type: application/json
+
+{
+  "year": 2023,
+  "month": 11,
+  "employeeId":{
+    "id":1
+  },
+  "benefit": [
+    {
+      "id": 1
+    }
+  ],
+  "rate": [
+    {
+      "id": 1
+    }
+  ]
+}

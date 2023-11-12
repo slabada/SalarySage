@@ -37,7 +37,8 @@ public class Handlers {
             BenefitException.NullBenefitException.class,
             RateException.NullRateException.class,
             PaySheetException.PaySheetNotFount.class,
-            TimeSheetException.TimeSheetDataNotFount.class
+            TimeSheetException.TimeSheetDataNotFount.class,
+            TimeSheetException.NoDatesException.class
     })
     public ResponseEntity<?> handleNotFound(Exception ex) {
         ErrorDTO error = new ErrorDTO(

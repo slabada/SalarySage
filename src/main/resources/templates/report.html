@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <title>Employee Details</title>
     <style>
@@ -31,7 +31,7 @@
         <th>Итоговая сумма</th>
     </tr>
     <tr th:each="prc: ${PaySheet}">
-        <td th:text="${prc.getDate()}">
+        <td th:text="${prc.getYear()} + '-' + ${prc.getMonth()}">
         <td th:text="${Employee.get().getPosition().getName()}">
         <td th:text="${Employee.get().getPosition().getRate()}">
         <td>

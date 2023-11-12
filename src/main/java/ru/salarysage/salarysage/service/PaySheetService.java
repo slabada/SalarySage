@@ -58,8 +58,8 @@ public class PaySheetService {
         // Поиск записей о рабочем времени для данного сотрудника и месяца.
         List<TimeSheetModel> t = timeSheetService.searchByYearAndMonth(
                 ps.getEmployeeId().getId(),
-                ps.getDate().getYear(),
-                (byte) ps.getDate().getMonth().getValue()
+                ps.getYear(),
+                (byte) ps.getMonth()
         );
 
         // Если записей о рабочем времени нет, выбрасываем исключение.
@@ -69,7 +69,7 @@ public class PaySheetService {
         Set<BenefitModel> bc = benefitService.check(ps);
         ps.setBenefit(bc);
 
-        // Проверка ставок для расчетного листка и установка их в расчетный листок.
+        // Проверка налог для расчетного листка и установка их в расчетный листок.
         Set<RateModel> rc = rateService.check(ps);
         ps.setRate(rc);
 
@@ -127,8 +127,8 @@ public class PaySheetService {
         // Поиск записей о рабочем времени для данного сотрудника и месяца.
         List<TimeSheetModel> t = timeSheetService.searchByYearAndMonth(
                 ps.getEmployeeId().getId(),
-                ps.getDate().getYear(),
-                (byte) ps.getDate().getMonth().getValue()
+                ps.getYear(),
+                (byte) ps.getMonth()
         );
 
         // Если записей о рабочем времени нет, выбрасываем исключение.
@@ -184,7 +184,7 @@ public class PaySheetService {
         List<PaySheetModel> ps = paySheetRepository.findAllByEmployeeId_Id(id);
 
         // Если расчетные листки не найдены, выбрасываем исключение.
-        if(ps.isEmpty()) throw new EmployeeException.EmployeeNotFoundException();
+        if(ps.isEmpty()) throw new PaySheetException.PaySheetNotFount();
 
         return ps;
     }

@@ -1,18 +1,15 @@
 package ru.salarysage.salarysage.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.YearMonth;
 import java.util.Set;
 
 // Сущность расчетного листа
@@ -27,8 +24,17 @@ public class PaySheetModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull(message = "Дата не может быть пустой")
-    private YearMonth date;
+//    @NotNull(message = "Дата не может быть пустой")
+//    @DateTimeFormat(pattern = "HHHH-mm")
+//    private LocalDate date;
+
+    @Min(value = 1970, message = "Год не может быть меньше 1970")
+    @Max(value = 2100, message = "Год не может быть больше 2100")
+    private int year;
+
+    @Min(value = 1, message = "Месяц не может быть меньше 1")
+    @Max(value = 2100, message = "Месяц не может быть больше 12")
+    private int month;
 
     @NotNull(message = "сотрудник не может быть пустой")
     @ManyToOne

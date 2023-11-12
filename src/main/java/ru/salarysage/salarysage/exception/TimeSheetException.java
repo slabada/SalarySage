@@ -7,6 +7,12 @@ public class TimeSheetException {
         }
     }
 
+    public static class NoDatesException extends RuntimeException {
+        public NoDatesException() {
+            super("Табелей с указанным месяцем не существует");
+        }
+    }
+
     public static class NullTimeSheetException extends RuntimeException {
         public NullTimeSheetException() {
             super("Табель не существует");

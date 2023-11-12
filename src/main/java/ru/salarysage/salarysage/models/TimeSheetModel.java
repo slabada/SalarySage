@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@Table(name = "Time_Sheet")
 public class TimeSheetModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
