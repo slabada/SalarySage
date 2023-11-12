@@ -5,7 +5,7 @@ POST http://localhost:8080/position/create
 Content-Type: application/json
 
 {
-  "name": "Программист321",
+  "name": "Программист",
   "rate": 50000
 }
 
