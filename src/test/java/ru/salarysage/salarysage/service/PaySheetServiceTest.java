@@ -99,7 +99,8 @@ class PaySheetServiceTest {
         ps.setBenefit(Collections.singleton(b));
         ps.setRate(Collections.singleton(r));
         ps.setEmployeeId(e);
-        ps.setDate(YearMonth.parse("2023-02"));
+        ps.setMonth(11);
+        ps.setYear(2023);
         ps.setTotalAmount(new BigDecimal(36_666));
 
         newps = new PaySheetModel();
@@ -108,7 +109,8 @@ class PaySheetServiceTest {
         newps.setBenefit(Collections.singleton(b));
         newps.setRate(Collections.singleton(r));
         newps.setEmployeeId(e);
-        newps.setDate(YearMonth.parse("2023-03"));
+        newps.setMonth(11);
+        newps.setYear(2023);
         newps.setTotalAmount(new BigDecimal(37_666));
     }
 
@@ -153,8 +155,8 @@ class PaySheetServiceTest {
 
         when(timeSheetService.searchByYearAndMonth(
                 ps.getEmployeeId().getId(),
-                ps.getDate().getYear(),
-                (byte) ps.getDate().getMonth().getValue()
+                ps.getYear(),
+                (byte) ps.getMonth()
         )).thenReturn(List.of(t));
 
         when(benefitService.check(ps)).thenReturn(Collections.singleton(b));
@@ -194,8 +196,8 @@ class PaySheetServiceTest {
 
         when(timeSheetService.searchByYearAndMonth(
                 newps.getEmployeeId().getId(),
-                newps.getDate().getYear(),
-                (byte) newps.getDate().getMonth().getValue()
+                newps.getYear(),
+                (byte) newps.getMonth()
         )).thenReturn(List.of(t));
 
         when(benefitService.check(newps)).thenReturn(Collections.singleton(b));
