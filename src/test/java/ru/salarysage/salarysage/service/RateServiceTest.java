@@ -6,11 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.salarysage.salarysage.exception.BenefitException;
 import ru.salarysage.salarysage.exception.GeneraleException;
 import ru.salarysage.salarysage.exception.RateException;
 import ru.salarysage.salarysage.models.RateModel;
 import ru.salarysage.salarysage.repository.RateRepository;
+import ru.salarysage.salarysage.event.CreateRateEvent;
 
 import java.util.Optional;
 
@@ -28,6 +28,8 @@ class RateServiceTest {
     private RateModel r;
 
     private RateModel newr;
+
+    CreateRateEvent event;
 
     @BeforeEach
     void setUp() {
@@ -52,7 +54,7 @@ class RateServiceTest {
 
         when(rateRepository.existsByName(StartRate.getName())).thenReturn(false);
 
-        rateService.createStartRate();
+        rateService.createStartRate(event);
 
         verify(rateRepository, times(1)).save(any(RateModel.class));
     }

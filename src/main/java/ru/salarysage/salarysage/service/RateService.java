@@ -1,12 +1,13 @@
 package ru.salarysage.salarysage.service;
 
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ru.salarysage.salarysage.exception.GeneraleException;
 import ru.salarysage.salarysage.exception.RateException;
 import ru.salarysage.salarysage.models.PaySheetModel;
 import ru.salarysage.salarysage.models.RateModel;
 import ru.salarysage.salarysage.repository.RateRepository;
+import ru.salarysage.salarysage.event.CreateRateEvent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,9 +23,8 @@ public class RateService {
         this.rateRepository = rateRepository;
     }
 
-    // Метод для создания начальной ставки.
-    @Bean
-    public void createStartRate() {
+    @EventListener()
+    public void createStartRate(CreateRateEvent event) {
         // Создание объекта начальной ставки
         RateModel startRate = new RateModel(1, "НДФЛ", 13);
 
