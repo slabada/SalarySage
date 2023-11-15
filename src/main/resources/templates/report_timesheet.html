@@ -27,6 +27,7 @@
         <th>Часы</th>
         <th>Выходной</th>
         <th>Больничный</th>
+        <th>Отпуск</th>
         <th>Примечание</th>
     </tr>
     <tr th:each="prc: ${TimeSheet}">
@@ -34,6 +35,7 @@
         <td th:text="${prc.getHoursWorked()}">
         <td th:text="${prc.isHoliday() ? 'Да' : 'Нет'}"></td>
         <td th:text="${prc.isMedical() ? 'Да' : 'Нет'}"></td>
+        <td th:text="${prc.isVacation() ? 'Да' : 'Нет'}"></td>
         <td th:text="${prc.getNotes()}">
     </tr>
 </table>

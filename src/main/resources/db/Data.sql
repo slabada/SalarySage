@@ -10,9 +10,9 @@ INSERT INTO employee (address, first_name, last_name, position_id) VALUES
 ('Улица пушкина, д. колотушкина', 'Василий','Юристов',2);
 
 -- Для создания записи в табели для конкретного сотрудника
-INSERT INTO time_sheet (date, hours_worked, is_holiday, is_medical, employee_id_id) VALUES
-('2023-11-12', '08:00:00', false, true, 1),
-('2023-11-12', '06:00:00', false, false, 2);
+INSERT INTO time_sheet (date, hours_worked, is_holiday, is_medical,is_vacation, employee_id_id) VALUES
+('2023-11-12', '08:00:00', false, false,false, 1),
+('2023-11-12', '06:00:00', false, false,false, 2);
 
 -- Для создания льготы
 INSERT INTO benefit (amount, name) VALUES
