@@ -27,7 +27,7 @@ public class Handlers {
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value()
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(error.getCode()).body(error);
     }
 
     @ExceptionHandler({
@@ -40,13 +40,13 @@ public class Handlers {
             TimeSheetException.TimeSheetDataNotFount.class,
             TimeSheetException.NoDatesException.class
     })
-    public ResponseEntity<?> handleNotFound(Exception ex) {
+    public ResponseEntity<ErrorDTO> handleNotFound(Exception ex) {
         ErrorDTO error = new ErrorDTO(
                 ex.getMessage(),
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value()
         );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return ResponseEntity.status(error.getCode()).body(error);
     }
 
     @ExceptionHandler({
@@ -55,25 +55,28 @@ public class Handlers {
             BenefitException.BenefitAlreadyExistsException.class,
             RateException.RateAlreadyExistsException.class
     })
-    public ResponseEntity<?> handleConflict(Exception ex) {
+    public ResponseEntity<ErrorDTO> handleConflict(Exception ex) {
         ErrorDTO error = new ErrorDTO(
                 ex.getMessage(),
                 LocalDateTime.now(),
                 HttpStatus.CONFLICT.value()
         );
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        return ResponseEntity.status(error.getCode()).body(error);
     }
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class
     })
-    public ResponseEntity<?> handleConflict(MethodArgumentNotValidException ex) {
-        String errorMessage = Objects.requireNonNull(ex.getBindingResult().getFieldError()).getDefaultMessage();
+    public ResponseEntity<ErrorDTO> handleConflict(MethodArgumentNotValidException ex) {
+        
+        String errorMessage = Objects.requireNonNull(ex.getBindingResult()
+                .getFieldError()).getDefaultMessage();
+
         ErrorDTO error = new ErrorDTO(
                 errorMessage,
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value()
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(error.getCode()).body(error);
     }
 }
