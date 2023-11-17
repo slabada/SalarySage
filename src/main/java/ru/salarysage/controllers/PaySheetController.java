@@ -46,6 +46,6 @@ public class PaySheetController {
     @GetMapping("/employee/{id}")
     @ResponseStatus(HttpStatus.OK)
     public List<PaySheetModel> getByEmployeeId(@PathVariable long id){
-        return paySheetService.getByEmployeeId(id);
+        return paySheetService.getAll(id);
     }
 }

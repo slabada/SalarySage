@@ -175,7 +175,7 @@ public class PaySheetService {
     }
 
     // Метод для получения списка расчетных листков для конкретного сотрудника.
-    public List<PaySheetModel> getByEmployeeId(long id){
+    public List<PaySheetModel> getAll(long id){
 
         // Проверка, что идентификатор сотрудника положителен.
         if(id <= 0) throw new GeneraleException.InvalidIdException();

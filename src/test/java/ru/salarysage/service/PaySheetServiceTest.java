@@ -132,7 +132,7 @@ class PaySheetServiceTest {
         assertThrows(EmployeeException.EmployeeNotFoundException.class, () ->{
             paySheetService.create(ps);
             paySheetService.put(ps.getId(), ps);
-            paySheetService.getByEmployeeId(ps.getId());
+            paySheetService.getAll(ps.getId());
         });
     }
 
@@ -143,7 +143,7 @@ class PaySheetServiceTest {
             paySheetService.get(-1L);
             paySheetService.put(-1L, ps);
             paySheetService.delete(-1L);
-            paySheetService.getByEmployeeId(-1L);
+            paySheetService.getAll(-1L);
         });
     }
 
@@ -229,7 +229,7 @@ class PaySheetServiceTest {
 
         when(paySheetRepository.findAllByEmployeeId_Id(ps.getId())).thenReturn(List.of(ps));
 
-        List<PaySheetModel> rps = paySheetService.getByEmployeeId(ps.getId());
+        List<PaySheetModel> rps = paySheetService.getAll(ps.getId());
 
         assertEquals(List.of(ps), rps);
     }

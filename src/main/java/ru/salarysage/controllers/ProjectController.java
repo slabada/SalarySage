@@ -1,8 +1,10 @@
 package ru.salarysage.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.salarysage.models.ProjectModel;
+import ru.salarysage.service.DocumentsService;
 import ru.salarysage.service.ProjectService;
 
 import java.util.Optional;
@@ -19,7 +21,7 @@ public class ProjectController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectModel create(@RequestBody ProjectModel p){
+    public ProjectModel create(@RequestBody @Valid ProjectModel p){
         return projectService.create(p);
     }
 
@@ -31,7 +33,7 @@ public class ProjectController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ProjectModel put(@PathVariable long id, @RequestBody ProjectModel p){
+    public ProjectModel put(@PathVariable long id, @RequestBody @Valid ProjectModel p){
         return projectService.put(id, p);
     }
 

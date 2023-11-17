@@ -16,6 +16,8 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheetModel, Long>
 
     boolean existsByDateAndEmployeeId(LocalDate date, EmployeeModel employeeId);
 
+    List<TimeSheetModel> findAllByEmployeeId_Id(long id);
+
     @Query("""
             SELECT e FROM TimeSheetModel e
             WHERE (:year IS NULL OR year(e.date) = :year)

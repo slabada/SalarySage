@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .left-block, .right-block {
+      flex: 1;
+      box-sizing: border-box;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .left-block {
+      background-color: #f5f5f5;
+      margin-right: 10px;
+    }
+
+    .right-block {
+      background-color: #f5f5f5;
+    }
+
+    .top-right h2, .bottom-right h2, .left-block h2 {
+      color: #333;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .table th, .table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .table th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+<div class="left-block">
+  <h2 th:text="'Проект: ' + ${Project.get().getName()}"></h2>
+  <h3 th:text="'Сроки: ' + ${Project.get().getStartDate()} + ' - ' + ${Project.get().getEndDate()}"></h3>
+  <h3 th:text="'Бюджет проекта: ' + ${Calculation}"></h3>
+</div>
+<div class="right-block">
+  <div class="top-right">
+    <h2>Участники разработки</h2>
+    <table class="table">
+      <thead class="table-header">
+      <tr>
+        <th>ФИО</th>
+        <th>Должность</th>
+        <th>Оклад</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="p : ${Project.get().getEmployees()}">
+        <td th:text="${p.getLastName()} + ' ' + ${p.getFirstName()}">
+        <td th:text="${p.getPosition().getName()}">
+        <td th:text="${p.getPosition().getRate()}">
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="bottom-right">
+    <h2>Доп. расходы</h2>
+    <table class="table">
+      <thead class="table-header">
+      <tr>
+        <th>Название</th>
+        <th>Сумма</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="p : ${Project.get().getExpenditure()}">
+        <td th:text="${p.getName()}" >
+        <td th:text="${p.getAmount()}" >
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

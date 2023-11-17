@@ -22,3 +22,20 @@ INSERT INTO benefit (amount, name) VALUES
 INSERT INTO pay_sheet (year, month, total_amount,  employee_id_id) VALUES
 (2023,11, '666', 1),
 (2023,11, '777', 2);
+
+-- Создание доп.расходники
+INSERT INTO expenditure (amount, name) VALUES
+(150000, 'Аутсорсинг дизайна'),
+(150000, 'Аутсорсинг ИИ технологий');
+
+-- Создание проекта
+INSERT INTO project (end_date, name, start_date) VALUES
+('2023-11-30', 'Финальный проект', '2023-11-01');
+
+-- Добавление в проект сотрудников
+INSERT INTO project_employee (project, employee) VALUES
+(1, 1);
+
+-- Добавление в проект расходника
+INSERT INTO project_expenditure (project, expenditure) VALUES
+(1, 1);

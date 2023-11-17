@@ -10,6 +10,7 @@ import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.models.ProjectModel;
 import ru.salarysage.repository.ProjectRepository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -45,6 +46,8 @@ public class ProjectService {
         p.setExpenditure(exDb);
 
         if(exDb.isEmpty()) throw new ExpenditureException.NoExpenditure();
+
+        if(p.getStartDate() == null) p.setStartDate(LocalDate.now());
 
         projectRepository.save(p);
 

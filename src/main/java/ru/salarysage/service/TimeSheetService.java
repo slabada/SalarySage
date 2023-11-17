@@ -135,4 +135,19 @@ public class TimeSheetService {
 
         return t;
     }
+
+    // Метод для получения всех записи о рабочем времени по её идентификатору сотрудника.
+    public List<TimeSheetModel> getAll(long id){
+
+        // Проверка, что идентификатор положителен.
+        if(id <= 0) throw new GeneraleException.InvalidIdException();
+
+        // Поиск записи о рабочем времени в базе данных по идентификатору.
+        List<TimeSheetModel> t = timeSheetRepository.findAllByEmployeeId_Id(id);
+
+        // Если запись не найдена, выбрасываем исключение.
+        if(t.isEmpty()) throw new TimeSheetException.NullTimeSheetException();
+
+        return t;
+    }
 }

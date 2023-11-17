@@ -27,9 +27,14 @@ public class TimeSheetModel {
     @NotNull(message = "Сотрудник не может быть пустым")
     @ManyToOne
     private EmployeeModel employeeId;
+
     private Time hoursWorked;
+
     private boolean isHoliday;
+
     private boolean isMedical;
+
     private boolean isVacation;
+
     private String notes;
 }

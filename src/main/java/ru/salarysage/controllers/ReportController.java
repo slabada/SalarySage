@@ -1,44 +1,74 @@
 package ru.salarysage.controllers;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.salarysage.service.DocumentsService;
+
+import java.io.IOException;
 
 @Controller
 @RequestMapping("/report")
 public class ReportController {
 
     protected final PaySheetController paySheetController;
-
     protected final EmployeeController employeeController;
-
     protected final TimeSheetController timeSheetController;
+    protected final DocumentsService documentsService;
 
     public ReportController(PaySheetController paySheetController,
                             EmployeeController employeeController,
-                            TimeSheetController timeSheetController) {
+                            TimeSheetController timeSheetController,
+                            DocumentsService documentsService) {
         this.paySheetController = paySheetController;
         this.employeeController = employeeController;
         this.timeSheetController = timeSheetController;
+        this.documentsService = documentsService;
     }
 
-    @GetMapping("/finance/{id}")
-    public String getReport(@PathVariable long id, Model model){
+    @GetMapping("/paysheet/{id}")
+    public String getPaySheet(@PathVariable long id, Model model){
         model.addAttribute("PaySheet", paySheetController.getByEmployeeId(id));
         model.addAttribute("Employee", employeeController.get(id));
-        return "report";
+        return "Finance";
+    }
+
+    @GetMapping("/paysheet/{id}/downloads/word")
+    public ResponseEntity<byte[]> downloadsPaySheetWord(@PathVariable long id,
+                                                HttpServletResponse response) throws IOException {
+        return ResponseEntity.ok().body(documentsService.generateWordPaySheetDocument(id, response));
+    }
+
+    @GetMapping("/paysheet/{id}/downloads/excel")
+    public ResponseEntity<byte[]> downloadsPaySheetExcel(@PathVariable long id,
+                                                        HttpServletResponse response) throws IOException {
+        return ResponseEntity.ok().body(documentsService.generateExcelPaySheetDocument(id, response));
     }
 
     @GetMapping("/timesheet/{id}")
     public String getTimeSheetReport(@PathVariable long id,
-                                     @RequestParam Integer year,
-                                     @RequestParam Byte month,
+                                     @RequestParam(required = false) Integer year,
+                                     @RequestParam(required = false) Byte month,
                                      Model model){
         model.addAttribute("TimeSheet", timeSheetController.searchByYearAndMonth(id, year, month));
         model.addAttribute("Employee", employeeController.get(id));
-        return "report_timesheet";
+        return "Timesheet";
+    }
+
+    @GetMapping("/timesheet/{id}/downloads/word")
+    public ResponseEntity<byte[]> timesheetDownloadsWord(@PathVariable long id,
+                                                HttpServletResponse response) throws IOException {
+        return ResponseEntity.ok().body(documentsService.generateWordTimeSheetDocument(id, response));
+    }
+
+    @GetMapping("/timesheet/{id}/downloads/excel")
+    public ResponseEntity<byte[]> timesheetDownloadsExcel(@PathVariable long id,
+                                                 HttpServletResponse response) throws IOException {
+        return ResponseEntity.ok().body(documentsService.generateExcelTimeSheetDocument(id, response));
     }
 }

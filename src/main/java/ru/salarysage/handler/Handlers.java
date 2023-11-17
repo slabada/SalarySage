@@ -40,7 +40,8 @@ public class Handlers {
             PaySheetException.PaySheetNotFount.class,
             TimeSheetException.TimeSheetDataNotFount.class,
             TimeSheetException.NoDatesException.class,
-            ExpenditureException.NoExpenditure.class
+            ExpenditureException.NoExpenditure.class,
+            ProjectException.NoProject.class
     })
     public ResponseEntity<ErrorDTO> handleNotFound(Exception ex) {
         ErrorDTO error = new ErrorDTO(

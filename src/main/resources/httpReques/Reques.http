@@ -97,6 +97,42 @@ Content-Type: application/json
   "benefit": [
     {
       "id": 1
+    },
+    {
+      "id": 2
+    }
+  ]
+}
+
+###
+
+# Создание расходника
+
+POST  http://localhost:8080/expenditure/create
+Content-Type: application/json
+
+{
+  "name": "Аутсорсинг дизайна",
+  "amount": 150000
+}
+
+###
+
+# Создание проекта с расходником
+
+POST  http://localhost:8080/project/create
+Content-Type: application/json
+
+{
+  "name": "Финальный проект",
+  "employees": [
+    {
+      "id": 1
+    }
+  ],
+  "expenditure": [
+    {
+      "id": 1
     }
   ]
 }

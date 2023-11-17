@@ -1,5 +1,6 @@
 package ru.salarysage.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class ExpenditureController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ExpenditureModel create(@RequestBody ExpenditureModel e){
+    public ExpenditureModel create(@RequestBody @Valid ExpenditureModel e){
         return expenditureService.create(e);
     }
 
@@ -32,7 +33,7 @@ public class ExpenditureController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ExpenditureModel put(@PathVariable long id, @RequestBody ExpenditureModel e){
+    public ExpenditureModel put(@PathVariable long id, @RequestBody @Valid ExpenditureModel e){
         return expenditureService.put(id,e);
     }
 
