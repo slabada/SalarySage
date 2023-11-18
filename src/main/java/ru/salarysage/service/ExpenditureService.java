@@ -3,7 +3,6 @@ package ru.salarysage.service;
 import org.springframework.stereotype.Service;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
-import ru.salarysage.models.EmployeeModel;
 import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.models.ProjectModel;
 import ru.salarysage.repository.ExpenditureRepository;

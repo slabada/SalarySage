@@ -4,6 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+
+    /* Add your existing styles here */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -57,6 +88,13 @@
   <h2 th:text="'Проект: ' + ${Project.get().getName()}"></h2>
   <h3 th:text="'Сроки: ' + ${Project.get().getStartDate()} + ' - ' + ${Project.get().getEndDate()}"></h3>
   <h3 th:text="'Бюджет проекта: ' + ${Calculation}"></h3>
+  <div class="dropdown">
+    <button>Скачать</button>
+    <div class="dropdown-content">
+      <a th:href="@{/analytics/{id}/downloads/word(id=${Project.get().getId()})}" target="_blank">Скачать Word</a>
+      <a th:href="@{/analytics/{id}/downloads/excel(id=${Project.get().getId()})}" target="_blank">Скачать Excel</a>
+    </div>
+  </div>
 </div>
 <div class="right-block">
   <div class="top-right">

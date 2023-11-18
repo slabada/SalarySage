@@ -97,9 +97,6 @@ Content-Type: application/json
   "benefit": [
     {
       "id": 1
-    },
-    {
-      "id": 2
     }
   ]
 }
@@ -125,6 +122,8 @@ Content-Type: application/json
 
 {
   "name": "Финальный проект",
+  "startDate": "2023-11-11",
+  "endDate": "2023-12-12",
   "employees": [
     {
       "id": 1

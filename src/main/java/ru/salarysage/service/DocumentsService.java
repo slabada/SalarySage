@@ -29,11 +29,11 @@ public class DocumentsService {
 
     // Тип контента и заголовки для Word документа
     private static final String CONTENT_TYPE = "application/word";
-    private static final String CONTENT_DISPOSITION = "attachment; filename=example.doc";
+    private static final String CONTENT_DISPOSITION = "attachment; filename=document.doc";
 
     // Тип контента и заголовки для Excel документа
     private static final String EXCEL_CONTENT_TYPE = "application/exel";
-    private static final String EXCEL_CONTENT_DISPOSITION = "attachment; filename=example.xlsx";
+    private static final String EXCEL_CONTENT_DISPOSITION = "attachment; filename=document.xlsx";
 
     // Конструктор службы, принимающий необходимые зависимости
     public DocumentsService(ProjectService projectService,
@@ -114,9 +114,6 @@ public class DocumentsService {
 
     // Вспомогательный метод для создания таблицы участников разработки в Word документе
     private void createDevelopersTable(XWPFDocument document, ProjectModel project) {
-        // Определение количества строк таблицы
-        int rows = project.getEmployees().size();
-        if(rows == 0) rows = 1;
 
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph developersParagraph = document.createParagraph();
@@ -127,7 +124,7 @@ public class DocumentsService {
         developersRun.setBold(true);
 
         // Создание таблицы и установка ширины
-        XWPFTable developersTable = document.createTable(rows, 3);
+        XWPFTable developersTable = document.createTable(1, 3);
         developersTable.setWidth("100%");
 
         // Получение строки заголовка таблицы и установка названий столбцов
@@ -150,9 +147,6 @@ public class DocumentsService {
 
     // Вспомогательный метод для создания таблицы дополнительных расходов в Word документе
     private void createExpenditureTable(XWPFDocument document, ProjectModel project) {
-        // Определение количества строк таблицы
-        int rows = project.getExpenditure().size();
-        if(rows == 0) rows = 1;
 
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph expenditureParagraph = document.createParagraph();
@@ -164,7 +158,7 @@ public class DocumentsService {
         expenditureRun.setBold(true);
 
         // Создание таблицы и установка ширины
-        XWPFTable expenditureTable = document.createTable(rows, 2);
+        XWPFTable expenditureTable = document.createTable(1, 2);
         expenditureTable.setWidth("100%");
 
         // Получение строки заголовка таблицы и установка названий столбцов
@@ -324,9 +318,6 @@ public class DocumentsService {
     // Вспомогательный метод для создания таблицы табеля времени word
     private void createTimeSheetTable(XWPFDocument document, List<TimeSheetModel> t, EmployeeModel e) {
 
-        int rows = t.size();
-        if(rows >= 2) rows -= 1;
-
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph timeSheetParagraph = document.createParagraph();
         XWPFRun timeSheetRun = timeSheetParagraph.createRun();
@@ -336,7 +327,7 @@ public class DocumentsService {
         timeSheetRun.setBold(true);
 
         // Создание таблицы и установка ширины
-        XWPFTable timeSheetTable = document.createTable(rows, 6);
+        XWPFTable timeSheetTable = document.createTable(1, 6);
         timeSheetTable.setWidth("100%");
 
         // Получение строки заголовка таблицы и установка названий столбцов
@@ -471,8 +462,8 @@ public class DocumentsService {
     // Вспомогательный метод для создания таблицы табеля времени word
     private void createPaySheetTable(XWPFDocument document, List<PaySheetModel> p, EmployeeModel e) {
 
-        int rows = p.size();
-        if(rows >= 2) rows -= 1;
+//        int rows = p.size();
+//        if(rows >= 2) rows -= 1;
 
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph paySheetParagraph = document.createParagraph();
@@ -483,7 +474,7 @@ public class DocumentsService {
         paySheetRun.setBold(true);
 
         // Создание таблицы и установка ширины
-        XWPFTable paySheetTable = document.createTable(rows, 6);
+        XWPFTable paySheetTable = document.createTable(1, 6);
         paySheetTable.setWidth("100%");
 
         // Получение строки заголовка таблицы и установка названий столбцов

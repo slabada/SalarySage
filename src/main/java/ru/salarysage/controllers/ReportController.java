@@ -35,7 +35,7 @@ public class ReportController {
     public String getPaySheet(@PathVariable long id, Model model){
         model.addAttribute("PaySheet", paySheetController.getByEmployeeId(id));
         model.addAttribute("Employee", employeeController.get(id));
-        return "Finance";
+        return "PaySheet";
     }
 
     @GetMapping("/paysheet/{id}/downloads/word")
@@ -57,7 +57,7 @@ public class ReportController {
                                      Model model){
         model.addAttribute("TimeSheet", timeSheetController.searchByYearAndMonth(id, year, month));
         model.addAttribute("Employee", employeeController.get(id));
-        return "Timesheet";
+        return "TimeSheet";
     }
 
     @GetMapping("/timesheet/{id}/downloads/word")

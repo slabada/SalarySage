@@ -45,7 +45,7 @@ public class AnalyticsController {
         return ResponseEntity.ok().body(documentsService.generateWordProjectDocument(id, response));
     }
 
-    @GetMapping("/{id}/downloads/exel")
+    @GetMapping("/{id}/downloads/excel")
     public ResponseEntity<byte[]> downloadExelProjectDocument(@PathVariable long id,
                                                               HttpServletResponse response) throws IOException {
         return ResponseEntity.ok().body(documentsService.generateExcelProjectDocument(id, response));

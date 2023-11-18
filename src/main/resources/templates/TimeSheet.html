@@ -4,6 +4,36 @@
     <meta charset="UTF-8">
     <title>Employee Details</title>
     <style>
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -12,7 +42,7 @@
             font-family: 'Arial', sans-serif;
         }
 
-        .left-block, .right-block {
+        .left-block {
             flex: 1;
             box-sizing: border-box;
             padding: 20px;
@@ -23,10 +53,6 @@
         .left-block {
             background-color: #f5f5f5;
             margin-right: 10px;
-        }
-
-        .right-block {
-            background-color: #f5f5f5;
         }
 
         .top-right h1, .bottom-right h1, .left-block h1 {
@@ -55,6 +81,13 @@
 <body>
 <div class="left-block">
     <h1>Табели сотрудника - <span th:text="${Employee.get().getFirstName()} + ' ' + ${Employee.get().getLastName()}"></span></h1>
+    <div class="dropdown">
+        <button>Скачать</button>
+        <div class="dropdown-content">
+            <a th:href="@{/report/timesheet/{id}/downloads/word(id = ${Employee.get().getId()})}" target="_blank">Скачать Word</a>
+            <a th:href="@{/report/timesheet/{id}/downloads/excel(id = ${Employee.get().getId()})}">Скачать Excel</a>
+        </div>
+    </div>
     <table class="table">
         <tr>
             <th>Дата</th>
