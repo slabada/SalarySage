@@ -462,9 +462,6 @@ public class DocumentsService {
     // Вспомогательный метод для создания таблицы табеля времени word
     private void createPaySheetTable(XWPFDocument document, List<PaySheetModel> p, EmployeeModel e) {
 
-//        int rows = p.size();
-//        if(rows >= 2) rows -= 1;
-
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph paySheetParagraph = document.createParagraph();
         XWPFRun paySheetRun = paySheetParagraph.createRun();
@@ -549,7 +546,7 @@ public class DocumentsService {
         return documentBytes;
     }
 
-
+    // Вспомогательный метод для создания таблицы табеля времени excel
     private static void createExcelPaySheet(Workbook workbook, List<PaySheetModel> paySheets, EmployeeModel employee) {
         Sheet sheet = workbook.createSheet(employee.getFirstName() + " " + employee.getLastName());
 
