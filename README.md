@@ -157,7 +157,7 @@ MVC: Проект
 ![image](https://github.com/slabada/SalarySage/assets/82341789/c1e4b471-f9f9-474c-9ef0-b7797f553aa5)
 
 Страница проекта
-![image](https://github.com/slabada/SalarySage/assets/82341789/20e4570c-08aa-49bd-994b-cd6f80a3850a)
+![image](https://github.com/slabada/SalarySage/assets/82341789/77485a43-2712-4c2e-b4d5-af68ce9c16f0)
 
 Пример скаченного word файла с страницы проекта
 ![image](https://github.com/slabada/SalarySage/assets/82341789/addd0b4b-6095-4535-b04c-2a47094f9cc3)
