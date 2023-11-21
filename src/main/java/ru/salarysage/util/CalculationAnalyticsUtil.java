@@ -41,18 +41,23 @@ public class CalculationAnalyticsUtil {
         // Считаем количество рабочих дней в текущем месяце отведенные на проект
         int workerDays = calculateWorkerDays(firstDayProject, lastDayProject);
 
+        // Рассчитываем бюджет на день
         BigDecimal budgetDay = calculationBudgetDay(budget, workerDays);
 
+        // Рассчитываем количество рабочих дней, затраченных на проект
         int workerDaysProject = calculateWorkerDaysProject(p.get().getStartDate(), p.get().getEndDate());
 
-        return budgetDay.multiply(BigDecimal.valueOf(workerDaysProject)).add(expenditure);
+        // Возвращаем общую сумму, учитывая бюджет на день, количество дней и расходы
+        return budgetDay.multiply(BigDecimal.valueOf(workerDaysProject)).add(expenditure).setScale(2, RoundingMode.HALF_UP);
     }
+
 
     // Считаем бюджет на сотрудников
     public BigDecimal calculationBudgetEmployee(Optional<ProjectModel> p){
         return p.get().getEmployees().stream()
                 .map(EmployeeModel -> EmployeeModel.getPosition().getRate())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     // Получение первого дня месяца из временного листа
@@ -79,7 +84,10 @@ public class CalculationAnalyticsUtil {
 
     // Находим дневной бюджет
     public BigDecimal calculationBudgetDay(BigDecimal budgetEmployee, int workerDays){
-        return budgetEmployee.divide(BigDecimal.valueOf(workerDays), 2, RoundingMode.HALF_UP);
+        return budgetEmployee.divide(
+                BigDecimal.valueOf(workerDays),
+                5, RoundingMode.DOWN
+        );
     }
 
     // Считаем количество рабочих дней отведенные на проект
@@ -95,6 +103,7 @@ public class CalculationAnalyticsUtil {
     public BigDecimal calculationBudgetExpenditure(Optional<ProjectModel> p){
         return p.get().getExpenditure().stream()
                 .map(ExpenditureModel::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }
