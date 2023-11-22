@@ -9,6 +9,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
 
+// Сущность проекта
+
 @Entity
 @Getter
 @Setter
