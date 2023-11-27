@@ -31,26 +31,18 @@ class TimeSheetServiceTest {
     private TimeSheetRepository timeSheetRepository;
     @Mock
     private EmployeeService employeeService;
-
     private TimeSheetModel t;
-
     private TimeSheetModel newt;
-
     private PositionModel p;
-
     private EmployeeModel e;
-
     @BeforeEach
     void setUp() {
-
         p = new PositionModel();
-
         p.setId(1L);
         p.setName("Test");
         p.setRate(new BigDecimal(50000));
 
         e = new EmployeeModel();
-
         e.setId(1L);
         e.setLastName("Test");
         e.setFirstName("Test");
@@ -58,7 +50,6 @@ class TimeSheetServiceTest {
         e.setPosition(p);
 
         t = new TimeSheetModel();
-
         t.setId(1L);
         t.setEmployeeId(e);
         t.setDate(LocalDate.parse("2023-02-02"));
@@ -67,7 +58,6 @@ class TimeSheetServiceTest {
         t.setHoursWorked(Time.valueOf("8:00:00"));
 
         newt = new TimeSheetModel();
-
         newt.setId(1L);
         newt.setEmployeeId(e);
         newt.setDate(LocalDate.parse("2023-02-02"));
@@ -78,9 +68,7 @@ class TimeSheetServiceTest {
 
     @Test
     void dateException(){
-
         when(timeSheetRepository.existsByDateAndEmployeeId(t.getDate(), t.getEmployeeId())).thenReturn(true);
-
         assertThrows(TimeSheetException.DateException.class, () ->{
             timeSheetService.create(t);
             timeSheetService.put(t.getId(), t);
@@ -89,7 +77,6 @@ class TimeSheetServiceTest {
 
     @Test
     void employeeNotFoundException(){
-
         assertThrows(EmployeeException.EmployeeNotFoundException.class, () ->{
             timeSheetService.create(t);
             timeSheetService.put(t.getId(), t);
@@ -99,9 +86,7 @@ class TimeSheetServiceTest {
 
     @Test
     void nullTimeSheetException(){
-
         when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.empty());
-
         assertThrows(TimeSheetException.NullTimeSheetException.class, () ->{
             timeSheetService.get(t.getId());
             timeSheetService.put(t.getId(), t);
@@ -112,7 +97,6 @@ class TimeSheetServiceTest {
 
     @Test
     void invalidIdException(){
-
         assertThrows(GeneraleException.InvalidIdException.class, () ->{
             timeSheetService.get(-1L);
             timeSheetService.put(-1L, t);
@@ -123,64 +107,43 @@ class TimeSheetServiceTest {
 
     @Test
     void create() {
-
         when(timeSheetRepository.existsByDateAndEmployeeId(t.getDate(), t.getEmployeeId())).thenReturn(false);
-
         when(employeeService.get(t.getEmployeeId().getId())).thenReturn(Optional.of(e));
-
         TimeSheetModel rt = timeSheetService.create(t);
-
         assertEquals(t, rt);
-
         verify(timeSheetRepository, times(1)).save(t);
     }
 
     @Test
     void get(){
-
         when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.of(t));
-
         Optional<TimeSheetModel> rt = timeSheetService.get(t.getId());
-
         assertTrue(rt.isPresent());
         assertEquals(t, rt.get());
     }
 
     @Test
     void put(){
-
         when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.of(t));
-
         when(timeSheetRepository.existsByDateAndEmployeeIdAndIdNot(newt.getDate(), newt.getEmployeeId(), t.getId())).thenReturn(false);
-
         when(employeeService.get(newt.getEmployeeId().getId())).thenReturn(Optional.of(e));
-
         TimeSheetModel rt = timeSheetService.put(t.getId(), newt);
-
         assertEquals(newt, rt);
-
         verify(timeSheetRepository, times(1)).save(newt);
     }
 
     @Test
     void delete(){
-
         when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.of(t));
-
         timeSheetService.delete(t.getId());
-
         verify(timeSheetRepository, times(1)).deleteById(t.getId());
     }
 
     @Test
     void searchByYearAndMonth(){
-
         when(employeeService.get(e.getId())).thenReturn(Optional.of(e));
-
         when(timeSheetRepository.findAllByYearAndMonth(2023, (byte) 2, e.getId())).thenReturn(List.of(t));
-
         List<TimeSheetModel> rt = timeSheetService.searchByYearAndMonth(1L,2023, (byte) 2);
-
         assertEquals(List.of(t), rt);
     }
 }

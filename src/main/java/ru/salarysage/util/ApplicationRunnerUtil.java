@@ -10,7 +10,6 @@ import ru.salarysage.event.CreateRateEvent;
 // дернуть метод createStartRate в RateService, который создает первоначальный налог "НДФЛ"
 @Component
 public class ApplicationRunnerUtil implements ApplicationRunner {
-
     public final ApplicationEventPublisher eventPublisher;
 
     public ApplicationRunnerUtil(ApplicationEventPublisher eventPublisher) {

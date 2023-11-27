@@ -39,32 +39,21 @@ class PaySheetServiceTest {
     private TimeSheetService timeSheetService;
     @Mock
     private CalculationUtil calculationUtil;
-
     private PaySheetModel ps;
-
     private PaySheetModel newps;
-
     private TimeSheetModel t;
-
     private PositionModel p;
-
     private EmployeeModel e;
-
     private BenefitModel b;
-
     private RateModel r;
-
     @BeforeEach
     void setUp() {
-
         p = new PositionModel();
-
         p.setId(1L);
         p.setName("Test");
         p.setRate(new BigDecimal(50000));
 
         e = new EmployeeModel();
-
         e.setId(1L);
         e.setLastName("Test");
         e.setFirstName("Test");
@@ -72,7 +61,6 @@ class PaySheetServiceTest {
         e.setPosition(p);
 
         t = new TimeSheetModel();
-
         t.setId(1L);
         t.setEmployeeId(e);
         t.setDate(LocalDate.parse("2023-02-02"));
@@ -81,19 +69,16 @@ class PaySheetServiceTest {
         t.setHoursWorked(Time.valueOf("8:00:00"));
 
         b = new BenefitModel();
-
         b.setId(1L);
         b.setName("Test");
         b.setAmount(new BigDecimal(1000));
 
         r = new RateModel();
-
         r.setId(1L);
         r.setName("Test");
         r.setPercent(13);
 
         ps = new PaySheetModel();
-
         ps.setId(1L);
         ps.setBenefit(Collections.singleton(b));
         ps.setRate(Collections.singleton(r));
@@ -103,7 +88,6 @@ class PaySheetServiceTest {
         ps.setTotalAmount(new BigDecimal(36_666));
 
         newps = new PaySheetModel();
-
         newps.setId(1L);
         newps.setBenefit(Collections.singleton(b));
         newps.setRate(Collections.singleton(r));
@@ -115,9 +99,7 @@ class PaySheetServiceTest {
 
     @Test
     void paySheetNotFount(){
-
         when(employeeService.get(ps.getEmployeeId().getId())).thenReturn(Optional.of(e));
-
         assertThrows(PaySheetException.PaySheetNotFount.class, () ->{
             paySheetService.create(ps);
             paySheetService.get(ps.getId());
@@ -128,7 +110,6 @@ class PaySheetServiceTest {
 
     @Test
     void employeeNotFoundException(){
-
         assertThrows(EmployeeException.EmployeeNotFoundException.class, () ->{
             paySheetService.create(ps);
             paySheetService.put(ps.getId(), ps);
@@ -138,7 +119,6 @@ class PaySheetServiceTest {
 
     @Test
     void invalidIdException(){
-
         assertThrows(GeneraleException.InvalidIdException.class, () ->{
             paySheetService.get(-1L);
             paySheetService.put(-1L, ps);
@@ -149,88 +129,63 @@ class PaySheetServiceTest {
 
     @Test
     void create() {
-
         when(employeeService.get(ps.getEmployeeId().getId())).thenReturn(Optional.of(e));
-
         when(timeSheetService.searchByYearAndMonth(
                 ps.getEmployeeId().getId(),
                 ps.getYear(),
                 (byte) ps.getMonth()
         )).thenReturn(List.of(t));
-
         when(benefitService.check(ps)).thenReturn(Collections.singleton(b));
-
         when(rateService.check(ps)).thenReturn(Collections.singleton(r));
-
         when(calculationUtil.calculationTotal(
                 List.of(t),
                 ps.getEmployeeId().getPosition(),
                 ps
         )).thenReturn(new BigDecimal(anyLong()));
-
         PaySheetModel rps = paySheetService.create(ps);
-
         assertEquals(ps, rps);
-
         verify(paySheetRepository,times(1)).save(ps);
     }
 
     @Test
     void get(){
-
         when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(ps));
-
         Optional<PaySheetModel> rps = paySheetService.get(ps.getId());
-
         assertTrue(rps.isPresent());
         assertEquals(ps, rps.get());
     }
 
     @Test
     void put(){
-
         when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(ps));
-
         when(employeeService.get(newps.getEmployeeId().getId())).thenReturn(Optional.of(e));
-
         when(timeSheetService.searchByYearAndMonth(
                 newps.getEmployeeId().getId(),
                 newps.getYear(),
                 (byte) newps.getMonth()
         )).thenReturn(List.of(t));
-
         when(benefitService.check(newps)).thenReturn(Collections.singleton(b));
-
         when(rateService.check(newps)).thenReturn(Collections.singleton(r));
-
         when(calculationUtil.calculationTotal(
                 List.of(t),
                 newps.getEmployeeId().getPosition(),
                 newps
         )).thenReturn(new BigDecimal(anyLong()));
-
         paySheetService.put(ps.getId(), newps);
-
         verify(paySheetRepository, times(1)).save(newps);
     }
 
     @Test
     void delete(){
-
         when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(ps));
-
         paySheetService.delete(ps.getId());
-
         verify(paySheetRepository, times(1)).findById(ps.getId());
     }
 
     @Test
     void getByEmployeeId(){
-
         when(paySheetRepository.findAllByEmployeeId_Id(ps.getId())).thenReturn(List.of(ps));
-
         List<PaySheetModel> rps = paySheetService.getAll(ps.getId());
-
         assertEquals(List.of(ps), rps);
     }
 }

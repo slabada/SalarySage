@@ -21,28 +21,21 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BenefitServiceTest {
-
     @InjectMocks
     private BenefitService benefitService;
-
     @Mock
     private BenefitRepository benefitRepository;
-
     private BenefitModel b;
-
     private BenefitModel newb;
 
     @BeforeEach
     void setUp() {
-
         b = new BenefitModel();
-
         b.setId(1L);
         b.setName("Test");
         b.setAmount(new BigDecimal(1000));
 
         newb = new BenefitModel();
-
         newb.setId(1L);
         newb.setName("newTest");
         newb.setAmount(new BigDecimal(1001));
@@ -83,47 +76,32 @@ class BenefitServiceTest {
 
     @Test
     void create() {
-
         when(benefitRepository.existsByName(b.getName())).thenReturn(false);
-
         benefitService.create(b);
-
         verify(benefitRepository, times(1)).save(b);
     }
 
     @Test
     void get(){
-
         when(benefitRepository.findById(b.getId())).thenReturn(Optional.of(b));
-
         Optional<BenefitModel> rb = benefitService.get(b.getId());
-
         Assertions.assertTrue(rb.isPresent());
         assertEquals(b, rb.get());
     }
 
     @Test
     void put(){
-
         when(benefitRepository.findById(b.getId())).thenReturn(Optional.of(b));
-
         when(benefitRepository.existsByNameAndIdNot(newb.getName(), b.getId())).thenReturn(false);
-
         BenefitModel rb = benefitService.put(b.getId(), newb);
-
         assertEquals(newb, rb);
-
         verify(benefitRepository, times(1)).save(newb);
-
     }
 
     @Test
     void delete(){
-
         when(benefitRepository.findById(b.getId())).thenReturn(Optional.of(b));
-
         benefitService.delete(b.getId());
-
         verify(benefitRepository, times(1)).deleteById(b.getId());
     }
 }

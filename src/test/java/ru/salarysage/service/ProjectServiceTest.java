@@ -26,40 +26,27 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
-
     @InjectMocks
     private ProjectService projectService;
-
     @Mock
     private ProjectRepository projectRepository;
-
     @Mock
     private EmployeeService employeeService;
-
     @Mock
     private ExpenditureService expenditureService;
-
     private ProjectModel pr;
-
     private ProjectModel newpr;
-
     private ExpenditureModel ex;
-
     private EmployeeModel e;
-
     private PositionModel p;
-
     @BeforeEach
     void setUp() {
-
         p = new PositionModel();
-
         p.setId(1L);
         p.setName("Test");
         p.setRate(new BigDecimal(50000));
 
         e = new EmployeeModel();
-
         e.setId(1L);
         e.setLastName("Test");
         e.setFirstName("Test");
@@ -67,13 +54,11 @@ class ProjectServiceTest {
         e.setPosition(p);
 
         ex = new ExpenditureModel();
-
         ex.setId(1L);
         ex.setName("Test");
         ex.setAmount(BigDecimal.valueOf(6666));
 
         pr = new ProjectModel();
-
         pr.setId(1L);
         pr.setName("Test");
         pr.setStartDate(LocalDate.now());
@@ -82,7 +67,6 @@ class ProjectServiceTest {
         pr.setExpenditure(Collections.singleton(ex));
 
         newpr = new ProjectModel();
-
         newpr.setId(1L);
         newpr.setName("newTest");
         newpr.setStartDate(LocalDate.now());
@@ -93,9 +77,7 @@ class ProjectServiceTest {
 
     @Test
     void projectConflictName(){
-
         when(projectRepository.existsByName(pr.getName())).thenReturn(true);
-
         assertThrows(ProjectException.ConflictName.class, () -> {
             projectService.create(pr);
             projectService.put(pr.getId(), newpr);
@@ -104,7 +86,6 @@ class ProjectServiceTest {
 
     @Test
     public void employeeNotFoundException() {
-
         assertThrows(EmployeeException.EmployeeNotFoundException.class, () -> {
             projectService.create(pr);
             projectService.put(pr.getId(), newpr);
@@ -113,7 +94,6 @@ class ProjectServiceTest {
 
     @Test
     public void invalidIdException() {
-
         assertThrows(GeneraleException.InvalidIdException.class, () -> {
             projectService.get(-1L);
             projectService.put(-1L, newpr);
@@ -123,9 +103,7 @@ class ProjectServiceTest {
 
     @Test
     void noExpenditure(){
-
         when(employeeService.check(pr)).thenReturn(Collections.singleton(e));
-
         assertThrows(ExpenditureException.NoExpenditure.class, () -> {
             projectService.create(pr);
             projectService.put(pr.getId(), newpr);
@@ -134,9 +112,7 @@ class ProjectServiceTest {
 
     @Test
     void noProject(){
-
         when(projectRepository.findById(e.getId())).thenReturn(Optional.empty());
-
         assertThrows(ProjectException.NoProject.class, () -> {
             projectService.get(pr.getId());
             projectService.put(pr.getId(), newpr);
@@ -146,56 +122,37 @@ class ProjectServiceTest {
 
     @Test
     void create() {
-
         when(projectRepository.existsByName(p.getName())).thenReturn(false);
-
         when(employeeService.check(pr)).thenReturn(Collections.singleton(e));
-
         when(expenditureService.check(pr)).thenReturn(Collections.singleton(ex));
-
         ProjectModel r = projectService.create(pr);
-
         verify(projectRepository, times(1)).save(pr);
-
         assertEquals(r, pr);
     }
 
     @Test
     void get(){
-
         when(projectRepository.findById(pr.getId())).thenReturn(Optional.ofNullable(pr));
-
         Optional<ProjectModel> r = projectService.get(pr.getId());
-
         assertTrue(r.isPresent());
         assertEquals(pr,r.get());
     }
 
     @Test
     void put(){
-
         when(projectRepository.findById(pr.getId())).thenReturn(Optional.ofNullable(pr));
-
         when(projectRepository.existsByNameAndIdNot(newpr.getName(), pr.getId())).thenReturn(false);
-
         when(employeeService.check(newpr)).thenReturn(Collections.singleton(e));
-
         when(expenditureService.check(newpr)).thenReturn(Collections.singleton(ex));
-
         ProjectModel r = projectService.put(pr.getId(), newpr);
-
         verify(projectRepository, times(1)).save(newpr);
-
         assertEquals(newpr , r);
     }
 
     @Test
     void delete(){
-
         when(projectRepository.findById(pr.getId())).thenReturn(Optional.ofNullable(pr));
-
         projectService.delete(p.getId());
-
         verify(projectRepository, times(1)).deleteById(pr.getId());
     }
 }
