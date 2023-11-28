@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.salarysage.dto.BenefitDTO;
 import ru.salarysage.exception.BenefitException;
 import ru.salarysage.exception.GeneraleException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.BenefitModel;
 import ru.salarysage.repository.BenefitRepository;
 
@@ -27,7 +28,10 @@ class BenefitServiceTest {
     private BenefitService benefitService;
     @Mock
     private BenefitRepository benefitRepository;
+    @Mock
+    private GenericMapper genericMapper;
     private BenefitModel b;
+    private BenefitDTO bDTO;
     private BenefitModel newb;
 
     @BeforeEach
@@ -36,6 +40,10 @@ class BenefitServiceTest {
         b.setId(1L);
         b.setName("Test");
         b.setAmount(new BigDecimal(1000));
+
+        bDTO = new BenefitDTO();
+        bDTO.setName("Test");
+        bDTO.setAmount(new BigDecimal(1000));
 
         newb = new BenefitModel();
         newb.setId(1L);
@@ -78,26 +86,38 @@ class BenefitServiceTest {
 
     @Test
     void create() {
-        when(benefitRepository.existsByName(b.getName())).thenReturn(false);
-        benefitService.create(b);
-        verify(benefitRepository, times(1)).save(b);
+        when(benefitRepository.existsByName(anyString())).thenReturn(false);
+        when(benefitRepository.save(any(BenefitModel.class))).thenReturn(b);
+        when(genericMapper.convertToDto(any(BenefitModel.class), eq(BenefitDTO.class))).thenReturn(bDTO);
+        BenefitDTO result = benefitService.create(b);
+        assertEquals(bDTO, result);
+        verify(benefitRepository).existsByName(b.getName());
+        verify(benefitRepository).save(b);
+        verify(genericMapper).convertToDto(b, BenefitDTO.class);
     }
 
     @Test
     void get(){
         when(benefitRepository.findById(b.getId())).thenReturn(Optional.of(b));
-        Optional<BenefitDTO> rb = benefitService.get(b.getId());
-        Assertions.assertTrue(rb.isPresent());
-        assertThat(rb.get()).usingRecursiveComparison().isEqualTo(b);
+        when(genericMapper.convertToDto(Optional.of(b), BenefitDTO.class)).thenReturn(bDTO);
+        Optional<BenefitDTO> result = benefitService.get(b.getId());
+        assertEquals(Optional.of(bDTO), result);
+        verify(benefitRepository).findById(b.getId());
+        verify(genericMapper).convertToDto(Optional.of(b), BenefitDTO.class);
     }
 
     @Test
     void put(){
         when(benefitRepository.findById(b.getId())).thenReturn(Optional.of(b));
-        when(benefitRepository.existsByNameAndIdNot(newb.getName(), b.getId())).thenReturn(false);
-        BenefitDTO rb = benefitService.put(b.getId(), newb);
-        assertThat(rb).usingRecursiveComparison().isEqualTo(newb);
-        verify(benefitRepository, times(1)).save(newb);
+        when(benefitRepository.existsByNameAndIdNot(anyString(), anyLong())).thenReturn(false);
+        when(benefitRepository.save(any(BenefitModel.class))).thenReturn(newb);
+        when(genericMapper.convertToDto(newb, BenefitDTO.class)).thenReturn(bDTO);
+        BenefitDTO result = benefitService.put(b.getId(), newb);
+        assertEquals(bDTO, result);
+        verify(benefitRepository).findById(b.getId());
+        verify(benefitRepository).existsByNameAndIdNot(newb.getName(), b.getId());
+        verify(benefitRepository).save(newb);
+        verify(genericMapper).convertToDto(newb, BenefitDTO.class);
     }
 
     @Test

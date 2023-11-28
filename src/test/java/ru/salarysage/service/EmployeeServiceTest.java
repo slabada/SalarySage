@@ -12,16 +12,19 @@ import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.EmployeeModel;
 import ru.salarysage.models.PositionModel;
 import ru.salarysage.repository.EmployeeRepository;
+import ru.salarysage.repository.PositionRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +34,9 @@ class EmployeeServiceTest {
     @Mock
     private EmployeeRepository employeeRepository;
     @Mock
-    private PositionService positionService;
+    private PositionRepository positionRepository;
+    @Mock
+    private GenericMapper genericMapper;
     private PositionModel p;
     private PositionDTO pDTO;
     private EmployeeModel e;
@@ -71,7 +76,7 @@ class EmployeeServiceTest {
 
     @Test
     public void positionNotFoundException() {
-        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.empty());
+        when(positionRepository.findById(e.getPosition().getId())).thenReturn(Optional.empty());
         assertThrows(PositionException.PositionNotFoundException.class, () -> {
             employeeService.create(e);
             employeeService.put(p.getId(), e);
@@ -106,27 +111,40 @@ class EmployeeServiceTest {
 
     @Test
     void create() {
-        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.of(pDTO));
-        employeeService.create(e);
-        verify(employeeRepository, times(1)).save(e);
+        when(positionRepository.findById(anyLong())).thenReturn(Optional.of(p));
+        when(employeeRepository.save(any(EmployeeModel.class))).thenReturn(e);
+        when(genericMapper.convertToDto(any(EmployeeModel.class), eq(EmployeeDTO.class))).thenReturn(eDTO);
+        EmployeeDTO result = employeeService.create(e);
+        assertEquals(eDTO, result);
+        verify(positionRepository).findById(p.getId());
+        verify(employeeRepository).save(e);
+        verify(genericMapper).convertToDto(e, EmployeeDTO.class);
     }
 
     @Test
     void get(){
         when(employeeRepository.findById(e.getId())).thenReturn(Optional.of(e));
-        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.of(pDTO));
-        Optional<EmployeeDTO> re = employeeService.get(e.getId());
-        assertTrue(re.isPresent());
-        assertThat(re.get()).usingRecursiveComparison().isEqualTo(e);
+        when(positionRepository.findById(anyLong())).thenReturn(Optional.of(p));
+        when(genericMapper.convertToDto(Optional.of(e), EmployeeDTO.class)).thenReturn(eDTO);
+        Optional<EmployeeDTO> result = employeeService.get(e.getId());
+        assertEquals(Optional.of(eDTO), result);
+        verify(employeeRepository).findById(e.getId());
+        verify(positionRepository).findById(p.getId());
+        verify(genericMapper).convertToDto(Optional.of(e), EmployeeDTO.class);
     }
 
     @Test
     void put(){
         when(employeeRepository.findById(e.getId())).thenReturn(Optional.of(e));
-        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.of(pDTO));
-        EmployeeDTO re = employeeService.put(e.getId(), newe);
-        assertThat(re).usingRecursiveComparison().isEqualTo(newe);
-        verify(employeeRepository, times(1)).save(newe);
+        when(positionRepository.findById(anyLong())).thenReturn(Optional.of(p));
+        when(employeeRepository.save(any(EmployeeModel.class))).thenReturn(newe);
+        when(genericMapper.convertToDto(newe, EmployeeDTO.class)).thenReturn(eDTO);
+        EmployeeDTO result = employeeService.put(e.getId(), newe);
+        assertEquals(eDTO, result);
+        verify(employeeRepository).findById(e.getId());
+        verify(positionRepository).findById(p.getId());
+        verify(employeeRepository).save(newe);
+        verify(genericMapper).convertToDto(newe, EmployeeDTO.class);
     }
 
     @Test

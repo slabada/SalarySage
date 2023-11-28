@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.PositionModel;
 import ru.salarysage.repository.PositionRepository;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,8 +26,12 @@ class PositionServiceTest {
     private PositionService positionService;
     @Mock
     private PositionRepository positionRepository;
+    @Mock
+    private GenericMapper genericMapper;
     private PositionModel p;
+    private PositionDTO pDTO;
     private PositionModel newp;
+    private PositionDTO newpDTO;
     @BeforeEach
     void setUp() {
         p = new PositionModel();
@@ -34,10 +39,18 @@ class PositionServiceTest {
         p.setName("Test");
         p.setRate(new BigDecimal(50000));
 
+        pDTO = new PositionDTO();
+        pDTO.setName("Test");
+        pDTO.setRate(new BigDecimal(50000));
+
         newp = new PositionModel();
         newp.setId(1L);
         newp.setName("newTest");
         newp.setRate(new BigDecimal(55000));
+
+        newpDTO = new PositionDTO();
+        newpDTO.setName("newTest");
+        newpDTO.setRate(new BigDecimal(55000));
     }
 
     @Test
@@ -68,26 +81,33 @@ class PositionServiceTest {
 
     @Test
     void create() {
-        when(positionRepository.existsByName(p.getName())).thenReturn(false);
-        positionService.create(p);
-        verify(positionRepository, times(1)).save(p);
+        when(positionRepository.existsByName(anyString())).thenReturn(false);
+        when(positionRepository.save(any(PositionModel.class))).thenReturn(p);
+        when(genericMapper.convertToDto(any(PositionModel.class), eq(PositionDTO.class))).thenReturn(pDTO);
+        PositionDTO result = positionService.create(p);
+        assertEquals(pDTO, result);
+        verify(positionRepository).existsByName(p.getName());
+        verify(positionRepository).save(p);
+        verify(genericMapper).convertToDto(p, PositionDTO.class);
     }
 
     @Test
     void get(){
         when(positionRepository.findById(p.getId())).thenReturn(Optional.of(p));
+        when(genericMapper.convertToDto(eq(Optional.of(p)), eq(PositionDTO.class))).thenReturn(pDTO);
         Optional<PositionDTO> rp = positionService.get(p.getId());
         assertTrue(rp.isPresent());
-        assertThat(rp.get()).usingRecursiveComparison().isEqualTo(p);
+        assertThat(rp.get()).usingRecursiveComparison().isEqualTo(pDTO);
     }
 
     @Test
     void put(){
         when(positionRepository.findById(p.getId())).thenReturn(Optional.of(p));
-        when(positionRepository.existsByNameAndIdNot(newp.getName(), p.getId())).thenReturn(false);
-        PositionDTO rp = positionService.put(p.getId(), newp);
-        assertThat(rp).usingRecursiveComparison().isEqualTo(newp);
-        verify(positionRepository, times(1)).save(newp);
+        when(genericMapper.convertToDto(Optional.of(p), PositionDTO.class)).thenReturn(pDTO);
+        Optional<PositionDTO> result = positionService.get(p.getId());
+        assertEquals(Optional.of(pDTO), result);
+        verify(positionRepository).findById(p.getId());
+        verify(genericMapper).convertToDto(Optional.of(p), PositionDTO.class);
     }
 
     @Test

@@ -152,8 +152,7 @@ public class PaySheetService {
         List<PaySheetDTO> psDTO = ps.stream()
                 .map(timeSheetModel -> genericMapper.convertToDto(
                         timeSheetModel,
-                        PaySheetDTO.class
-                        )
+                        PaySheetDTO.class)
                 ).toList();
         return psDTO;
     }

@@ -12,14 +12,17 @@ import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.TimeSheetException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.EmployeeModel;
 import ru.salarysage.models.PositionModel;
 import ru.salarysage.models.TimeSheetModel;
+import ru.salarysage.repository.EmployeeRepository;
 import ru.salarysage.repository.TimeSheetRepository;
 
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +37,9 @@ class TimeSheetServiceTest {
     @Mock
     private TimeSheetRepository timeSheetRepository;
     @Mock
-    private EmployeeService employeeService;
+    private EmployeeRepository employeeRepository;
+    @Mock
+    private GenericMapper genericMapper;
     private TimeSheetModel t;
     private TimeSheetDTO tDTO;
     private TimeSheetModel newt;
@@ -139,30 +144,50 @@ class TimeSheetServiceTest {
 
     @Test
     void create() {
-        when(timeSheetRepository.existsByDateAndEmployeeId(t.getDate(), t.getEmployeeId())).thenReturn(false);
-        when(employeeService.get(t.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
-        TimeSheetDTO rt = timeSheetService.create(t);
-        assertThat(rt).usingRecursiveComparison().isEqualTo(tDTO);
-        verify(timeSheetRepository, times(1)).save(t);
+        when(timeSheetRepository.existsByDateAndEmployeeId(any(LocalDate.class), any(EmployeeModel.class))).thenReturn(false);
+        when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(e));
+        when(timeSheetRepository.save(any(TimeSheetModel.class))).thenReturn(t);
+        when(genericMapper.convertToDto(any(TimeSheetModel.class), eq(TimeSheetDTO.class))).thenReturn(tDTO);
+
+        // Вызываем тестируемый метод
+        TimeSheetDTO result = timeSheetService.create(t);
+
+        // Проверяем результат
+        assertEquals(tDTO, result);
+
+        // Проверяем, что методы были вызваны с правильными аргументами
+        verify(timeSheetRepository).existsByDateAndEmployeeId(t.getDate(), t.getEmployeeId());
+        verify(employeeRepository).findById(e.getId());
+        verify(timeSheetRepository).save(t);
+        verify(genericMapper).convertToDto(t, TimeSheetDTO.class);
     }
 
     @Test
     void get(){
         when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.of(t));
-        when(employeeService.get(t.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
-        Optional<TimeSheetDTO> rt = timeSheetService.get(t.getId());
-        assertTrue(rt.isPresent());
-        assertThat(rt.get()).usingRecursiveComparison().isEqualTo(t);
+        when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(e));
+        when(genericMapper.convertToDto(Optional.of(t), TimeSheetDTO.class)).thenReturn(tDTO);
+        Optional<TimeSheetDTO> result = timeSheetService.get(t.getId());
+        assertEquals(Optional.of(tDTO), result);
+        verify(timeSheetRepository).findById(t.getId());
+        verify(employeeRepository).findById(e.getId());
+        verify(genericMapper).convertToDto(Optional.of(t), TimeSheetDTO.class);
     }
 
     @Test
     void put(){
-        when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.of(t));
-        when(timeSheetRepository.existsByDateAndEmployeeIdAndIdNot(newt.getDate(), newt.getEmployeeId(), t.getId())).thenReturn(false);
-        when(employeeService.get(newt.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
-        TimeSheetDTO rt = timeSheetService.put(t.getId(), newt);
-        assertThat(rt).usingRecursiveComparison().isEqualTo(newtDTO);
-        verify(timeSheetRepository, times(1)).save(newt);
+        when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.of(newt));
+        when(timeSheetRepository.existsByDateAndEmployeeIdAndIdNot(any(LocalDate.class), any(EmployeeModel.class), anyLong())).thenReturn(false);
+        when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(e));
+        when(timeSheetRepository.save(any(TimeSheetModel.class))).thenReturn(newt);
+        when(genericMapper.convertToDto(newt, TimeSheetDTO.class)).thenReturn(tDTO);
+        TimeSheetDTO result = timeSheetService.put(t.getId(), newt);
+        assertEquals(tDTO, result);
+        verify(timeSheetRepository).findById(t.getId());
+        verify(timeSheetRepository).existsByDateAndEmployeeIdAndIdNot(newt.getDate(), newt.getEmployeeId(), t.getId());
+        verify(employeeRepository).findById(e.getId());
+        verify(timeSheetRepository).save(newt);
+        verify(genericMapper).convertToDto(newt, TimeSheetDTO.class);
     }
 
     @Test
@@ -174,9 +199,27 @@ class TimeSheetServiceTest {
 
     @Test
     void searchByYearAndMonth(){
-        when(employeeService.get(e.getId())).thenReturn(Optional.of(eDTO));
-        when(timeSheetRepository.findAllByYearAndMonth(2023, (byte) 2, e.getId())).thenReturn(List.of(t));
-        List<TimeSheetDTO> rt = timeSheetService.searchByYearAndMonth(1L,2023, (byte) 2);
-        assertThat(rt).usingRecursiveComparison().isEqualTo(List.of(t));
+        when(employeeRepository.findById(e.getId())).thenReturn(Optional.of(e));
+        when(timeSheetRepository.findAllByYearAndMonth(
+                t.getDate().getYear(),
+                (byte) t.getDate().getMonth().getValue(),
+                e.getId())
+        ).thenReturn(Collections.singletonList(t));
+        when(genericMapper.convertToDto(
+                any(TimeSheetModel.class),
+                eq(TimeSheetDTO.class)
+        )).thenReturn(tDTO);
+        List<TimeSheetDTO> result = timeSheetService.searchByYearAndMonth(
+                e.getId(),
+                t.getDate().getYear(),
+                (byte) t.getDate().getMonth().getValue()
+        );
+        assertEquals(List.of(tDTO), result);
+        verify(employeeRepository).findById(e.getId());
+        verify(timeSheetRepository).findAllByYearAndMonth(
+                t.getDate().getYear(),
+                (byte) t.getDate().getMonth().getValue(),
+                e.getId());
+        verify(genericMapper).convertToDto(t, TimeSheetDTO.class);
     }
 }

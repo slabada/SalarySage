@@ -9,15 +9,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.salarysage.dto.RateDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.RateException;
-import ru.salarysage.listener.RateListener;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.RateModel;
 import ru.salarysage.repository.RateRepository;
-import ru.salarysage.event.CreateRateEvent;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +26,8 @@ class RateServiceTest {
 
     @Mock
     private RateRepository rateRepository;
-
+    @Mock
+    private GenericMapper genericMapper;
     private RateModel r;
 
     private RateDTO rDTO;
@@ -81,26 +81,38 @@ class RateServiceTest {
 
     @Test
     void create() {
-        when(rateRepository.existsByName(r.getName())).thenReturn(false);
-        rateService.create(r);
-        verify(rateRepository, times(1)).save(r);
+        when(rateRepository.existsByName(anyString())).thenReturn(false);
+        when(rateRepository.save(any(RateModel.class))).thenReturn(r);
+        when(genericMapper.convertToDto(any(RateModel.class), eq(RateDTO.class))).thenReturn(rDTO);
+        RateDTO result = rateService.create(r);
+        assertEquals(rDTO, result);
+        verify(rateRepository).existsByName(r.getName());
+        verify(rateRepository).save(r);
+        verify(genericMapper).convertToDto(r, RateDTO.class);
     }
 
     @Test
     void get(){
         when(rateRepository.findById(r.getId())).thenReturn(Optional.of(r));
-        Optional<RateDTO> rr = rateService.get(r.getId());
-        assertTrue(rr.isPresent());
-        assertThat(rr.get()).usingRecursiveComparison().isEqualTo(r);
+        when(genericMapper.convertToDto(Optional.of(r), RateDTO.class)).thenReturn(rDTO);
+        Optional<RateDTO> result = rateService.get(r.getId());
+        assertEquals(Optional.of(rDTO), result);
+        verify(rateRepository).findById(r.getId());
+        verify(genericMapper).convertToDto(Optional.of(r), RateDTO.class);
     }
 
     @Test
     void put(){
-        when(rateRepository.findById(r.getId())).thenReturn(Optional.of(r));
-        when(rateRepository.existsByNameAndIdNot(newr.getName(), r.getId())).thenReturn(false);
-        RateDTO rr = rateService.put(r.getId(),newr);
-        assertThat(rr).usingRecursiveComparison().isEqualTo(newr);
-        verify(rateRepository, times(1)).save(newr);
+        when(rateRepository.findById(r.getId())).thenReturn(Optional.of(newr));
+        when(rateRepository.existsByNameAndIdNot(anyString(), anyLong())).thenReturn(false);
+        when(rateRepository.save(any(RateModel.class))).thenReturn(newr);
+        when(genericMapper.convertToDto(newr, RateDTO.class)).thenReturn(rDTO);
+        RateDTO result = rateService.put(r.getId(), newr);
+        assertEquals(rDTO, result);
+        verify(rateRepository).findById(r.getId());
+        verify(rateRepository).existsByNameAndIdNot(newr.getName(), r.getId());
+        verify(rateRepository).save(newr);
+        verify(genericMapper).convertToDto(newr, RateDTO.class);
     }
 
     @Test

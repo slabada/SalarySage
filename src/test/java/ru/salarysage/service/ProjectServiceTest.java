@@ -14,6 +14,7 @@ import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.ProjectException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.EmployeeModel;
 import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.models.PositionModel;
@@ -26,8 +27,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,7 +40,10 @@ class ProjectServiceTest {
     private EmployeeService employeeService;
     @Mock
     private ExpenditureService expenditureService;
+    @Mock
+    private GenericMapper genericMapper;
     private ProjectModel pr;
+    private ProjectDTO prDTO;
     private ProjectModel newpr;
     private ExpenditureModel ex;
     private ExpenditureDTO exDTO;
@@ -88,6 +91,13 @@ class ProjectServiceTest {
         pr.setEndDate(LocalDate.now().plusDays(15));
         pr.setEmployees(Collections.singleton(e));
         pr.setExpenditure(Collections.singleton(ex));
+
+        prDTO = new ProjectDTO();
+        prDTO.setName("Test");
+        prDTO.setStartDate(LocalDate.now());
+        prDTO.setEndDate(LocalDate.now().plusDays(15));
+        prDTO.setEmployees(Collections.singleton(eDTO));
+        prDTO.setExpenditure(Collections.singleton(exDTO));
 
         newpr = new ProjectModel();
         newpr.setId(1L);
@@ -145,33 +155,50 @@ class ProjectServiceTest {
 
     @Test
     void create() {
-        when(projectRepository.existsByName(p.getName())).thenReturn(false);
-        when(employeeService.check(pr)).thenReturn(Collections.singleton(e));
-        when(expenditureService.check(pr)).thenReturn(Collections.singleton(ex));
-        ProjectDTO r = projectService.create(pr);
-        verify(projectRepository, times(1)).save(pr);
-        assertThat(r).usingRecursiveComparison().isEqualTo(pr);
+        when(projectRepository.existsByName(anyString())).thenReturn(false);
+        when(employeeService.check(any(ProjectModel.class))).thenReturn(Collections.singleton(e));
+        when(expenditureService.check(any(ProjectModel.class))).thenReturn(Collections.singleton(ex));
+        when(projectRepository.save(any(ProjectModel.class))).thenReturn(pr);
+        when(genericMapper.convertToDto(any(ProjectModel.class), eq(ProjectDTO.class))).thenReturn(prDTO);
+        ProjectDTO result = projectService.create(pr);
+        assertEquals(prDTO, result);
+        verify(projectRepository).existsByName(p.getName());
+        verify(employeeService).check(pr);
+        verify(expenditureService).check(pr);
+        verify(projectRepository).save(pr);
+        verify(genericMapper).convertToDto(pr, ProjectDTO.class);
     }
 
     @Test
     void get(){
-        when(projectRepository.findById(pr.getId())).thenReturn(Optional.ofNullable(pr));
-        when(employeeService.check(pr)).thenReturn(Collections.singleton(e));
-        when(expenditureService.check(pr)).thenReturn(Collections.singleton(ex));
-        Optional<ProjectDTO> r = projectService.get(pr.getId());
-        assertTrue(r.isPresent());
-        assertThat(r.get()).usingRecursiveComparison().isEqualTo(pr);
+        when(projectRepository.findById(pr.getId())).thenReturn(Optional.of(pr));
+        when(employeeService.check(any(ProjectModel.class))).thenReturn(Collections.singleton(e));
+        when(expenditureService.check(any(ProjectModel.class))).thenReturn(Collections.singleton(ex));
+        when(genericMapper.convertToDto(Optional.of(pr), ProjectDTO.class)).thenReturn(prDTO);
+        Optional<ProjectDTO> result = projectService.get(pr.getId());
+        assertEquals(Optional.of(prDTO), result);
+        verify(projectRepository).findById(pr.getId());
+        verify(employeeService).check(pr);
+        verify(expenditureService).check(pr);
+        verify(genericMapper).convertToDto(Optional.of(pr), ProjectDTO.class);
     }
 
     @Test
     void put(){
-        when(projectRepository.findById(pr.getId())).thenReturn(Optional.ofNullable(pr));
-        when(projectRepository.existsByNameAndIdNot(newpr.getName(), pr.getId())).thenReturn(false);
-        when(employeeService.check(newpr)).thenReturn(Collections.singleton(e));
-        when(expenditureService.check(newpr)).thenReturn(Collections.singleton(ex));
-        ProjectDTO r = projectService.put(pr.getId(), newpr);
-        verify(projectRepository, times(1)).save(newpr);
-        assertThat(r).usingRecursiveComparison().isEqualTo(newpr);
+        when(projectRepository.findById(pr.getId())).thenReturn(Optional.of(pr));
+        when(projectRepository.existsByNameAndIdNot(anyString(), anyLong())).thenReturn(false);
+        when(employeeService.check(any(ProjectModel.class))).thenReturn(Collections.singleton(e));
+        when(expenditureService.check(any(ProjectModel.class))).thenReturn(Collections.singleton(ex));
+        when(projectRepository.save(any(ProjectModel.class))).thenReturn(newpr);
+        when(genericMapper.convertToDto(newpr, ProjectDTO.class)).thenReturn(prDTO);
+        ProjectDTO result = projectService.put(pr.getId(), newpr);
+        assertEquals(prDTO, result);
+        verify(projectRepository).findById(pr.getId());
+        verify(projectRepository).existsByNameAndIdNot(newpr.getName(), pr.getId());
+        verify(employeeService).check(newpr);
+        verify(expenditureService).check(newpr);
+        verify(projectRepository).save(newpr);
+        verify(genericMapper).convertToDto(newpr, ProjectDTO.class);
     }
 
     @Test

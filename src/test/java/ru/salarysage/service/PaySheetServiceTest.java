@@ -10,7 +10,9 @@ import ru.salarysage.dto.*;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PaySheetException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.*;
+import ru.salarysage.repository.EmployeeRepository;
 import ru.salarysage.repository.PaySheetRepository;
 import ru.salarysage.util.CalculationUtil;
 
@@ -21,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +34,7 @@ class PaySheetServiceTest {
     @Mock
     private PaySheetRepository paySheetRepository;
     @Mock
-    private EmployeeService employeeService;
+    private EmployeeRepository employeeRepository;
     @Mock
     private RateService rateService;
     @Mock
@@ -41,6 +43,8 @@ class PaySheetServiceTest {
     private TimeSheetService timeSheetService;
     @Mock
     private CalculationUtil calculationUtil;
+    @Mock
+    private GenericMapper genericMapper;
     private PaySheetModel ps;
     private PaySheetDTO psDTO;
     private PaySheetModel newps;
@@ -150,7 +154,7 @@ class PaySheetServiceTest {
 
     @Test
     void paySheetNotFount(){
-        when(employeeService.get(ps.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
+        when(employeeRepository.findById(ps.getEmployeeId().getId())).thenReturn(Optional.of(e));
         assertThrows(PaySheetException.PaySheetNotFount.class, () ->{
             paySheetService.create(ps);
             paySheetService.get(ps.getId());
@@ -180,51 +184,54 @@ class PaySheetServiceTest {
 
     @Test
     void create() {
-        when(employeeService.get(ps.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
-        when(timeSheetService.searchByYearAndMonth(
-                ps.getEmployeeId().getId(),
-                ps.getYear(),
-                (byte) ps.getMonth()
-        )).thenReturn(List.of(tDTO));
-        when(benefitService.check(ps)).thenReturn(Collections.singleton(b));
-        when(rateService.check(ps)).thenReturn(Collections.singleton(r));
-        when(calculationUtil.calculationTotal(
-                List.of(tDTO),
-                ps.getEmployeeId().getPosition(),
-                ps
-        )).thenReturn(psDTO.getTotalAmount());
-        PaySheetDTO rps = paySheetService.create(ps);
-        assertThat(rps).usingRecursiveComparison().isEqualTo(psDTO);
-        verify(paySheetRepository,times(1)).save(ps);
+        when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(e));
+        when(timeSheetService.searchByYearAndMonth(anyLong(), anyInt(), anyByte())).thenReturn(Collections.singletonList(tDTO));
+        when(benefitService.check(any(PaySheetModel.class))).thenReturn(Collections.singleton(b));
+        when(rateService.check(any(PaySheetModel.class))).thenReturn(Collections.singleton(r));
+        when(calculationUtil.calculationTotal(anyList(), any(PositionModel.class), any(PaySheetModel.class))).thenReturn(new BigDecimal("100"));
+        when(paySheetRepository.save(any(PaySheetModel.class))).thenReturn(ps);
+        when(genericMapper.convertToDto(ps, PaySheetDTO.class)).thenReturn(psDTO);
+        PaySheetDTO result = paySheetService.create(ps);
+        assertEquals(psDTO, result);
+        verify(employeeRepository).findById(e.getId());
+        verify(timeSheetService).searchByYearAndMonth(e.getId(), ps.getYear(), (byte) ps.getMonth());
+        verify(benefitService).check(ps);
+        verify(rateService).check(ps);
+        verify(calculationUtil).calculationTotal(Collections.singletonList(tDTO), e.getPosition(), ps);
+        verify(paySheetRepository).save(ps);
+        verify(genericMapper).convertToDto(ps, PaySheetDTO.class);
     }
 
     @Test
     void get(){
         when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(ps));
-        Optional<PaySheetDTO> rps = paySheetService.get(ps.getId());
-        assertTrue(rps.isPresent());
-        assertThat(rps.get()).usingRecursiveComparison().isEqualTo(ps);
+        when(genericMapper.convertToDto(Optional.of(ps), PaySheetDTO.class)).thenReturn(psDTO);
+        Optional<PaySheetDTO> result = paySheetService.get(ps.getId());
+        assertEquals(Optional.of(psDTO), result);
+        verify(paySheetRepository).findById(ps.getId());
+        verify(genericMapper).convertToDto(Optional.of(ps), PaySheetDTO.class);
     }
 
     @Test
     void put(){
         when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(ps));
-        when(employeeService.get(newps.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
-        when(timeSheetService.searchByYearAndMonth(
-                newps.getEmployeeId().getId(),
-                newps.getYear(),
-                (byte) newps.getMonth()
-        )).thenReturn(List.of(tDTO));
-        when(benefitService.check(newps)).thenReturn(Collections.singleton(b));
-        when(rateService.check(newps)).thenReturn(Collections.singleton(r));
-        when(calculationUtil.calculationTotal(
-                List.of(tDTO),
-                newps.getEmployeeId().getPosition(),
-                newps
-        )).thenReturn(newpsDTO.getTotalAmount());
-        PaySheetDTO rps = paySheetService.put(ps.getId(), newps);
-        assertThat(rps).usingRecursiveComparison().isEqualTo(newpsDTO);
-        verify(paySheetRepository, times(1)).save(newps);
+        when(employeeRepository.findById(anyLong())).thenReturn(Optional.of(e));
+        when(timeSheetService.searchByYearAndMonth(anyLong(), anyInt(), anyByte())).thenReturn(Collections.singletonList(tDTO));
+        when(benefitService.check(any(PaySheetModel.class))).thenReturn(Collections.singleton(b));
+        when(rateService.check(any(PaySheetModel.class))).thenReturn(Collections.singleton(r));
+        when(calculationUtil.calculationTotal(anyList(), any(PositionModel.class), any(PaySheetModel.class))).thenReturn(new BigDecimal("100.00"));
+        when(paySheetRepository.save(any(PaySheetModel.class))).thenReturn(newps);
+        when(genericMapper.convertToDto(newps, PaySheetDTO.class)).thenReturn(psDTO);
+        PaySheetDTO result = paySheetService.put(ps.getId(), newps);
+        assertEquals(psDTO, result);
+        verify(paySheetRepository).findById(ps.getId());
+        verify(employeeRepository).findById(e.getId());
+        verify(timeSheetService).searchByYearAndMonth(e.getId(), newps.getYear(), (byte) newps.getMonth());
+        verify(benefitService).check(newps);
+        verify(rateService).check(newps);
+        verify(calculationUtil).calculationTotal(Collections.singletonList(tDTO), e.getPosition(), newps);
+        verify(paySheetRepository).save(newps);
+        verify(genericMapper).convertToDto(newps, PaySheetDTO.class);
     }
 
     @Test
@@ -235,9 +242,12 @@ class PaySheetServiceTest {
     }
 
     @Test
-    void getByEmployeeId(){
-        when(paySheetRepository.findAllByEmployeeId_Id(ps.getId())).thenReturn(List.of(ps));
-        List<PaySheetDTO> rps = paySheetService.getAll(ps.getId());
-        assertThat(rps).usingRecursiveComparison().isEqualTo(List.of(ps));
+    void getAll(){
+        when(paySheetRepository.findAllByEmployeeId_Id(ps.getId())).thenReturn(Collections.singletonList(ps));
+        when(genericMapper.convertToDto(any(PaySheetModel.class), eq(PaySheetDTO.class))).thenReturn(psDTO);
+        List<PaySheetDTO> result = paySheetService.getAll(ps.getId());
+        assertEquals(List.of(psDTO), result);
+        verify(paySheetRepository).findAllByEmployeeId_Id(ps.getId());
+        verify(genericMapper).convertToDto(ps, PaySheetDTO.class);
     }
 }

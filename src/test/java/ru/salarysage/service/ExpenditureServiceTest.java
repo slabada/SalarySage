@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.salarysage.dto.ExpenditureDTO;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.repository.ExpenditureRepository;
 
@@ -27,6 +28,8 @@ class ExpenditureServiceTest {
     private ExpenditureService expenditureService;
     @Mock
     private ExpenditureRepository expenditureRepository;
+    @Mock
+    private GenericMapper genericMapper;
     private ExpenditureModel e;
     private ExpenditureDTO eDTO;
     private ExpenditureModel newE;
@@ -77,27 +80,38 @@ class ExpenditureServiceTest {
 
     @Test
     void create() {
-        when(expenditureRepository.existsByName(e.getName())).thenReturn(false);
-        ExpenditureDTO r = expenditureService.create(e);
-        verify(expenditureRepository, times(1)).save(e);
-        assertThat(r).usingRecursiveComparison().isEqualTo(e);
+        when(expenditureRepository.existsByName(anyString())).thenReturn(false);
+        when(expenditureRepository.save(any(ExpenditureModel.class))).thenReturn(e);
+        when(genericMapper.convertToDto(any(ExpenditureModel.class), eq(ExpenditureDTO.class))).thenReturn(eDTO);
+        ExpenditureDTO result = expenditureService.create(e);
+        assertEquals(eDTO, result);
+        verify(expenditureRepository).existsByName(e.getName());
+        verify(expenditureRepository).save(e);
+        verify(genericMapper).convertToDto(e, ExpenditureDTO.class);
     }
 
     @Test
     void get(){
-        when(expenditureRepository.findById(e.getId())).thenReturn(Optional.ofNullable(e));
-        Optional<ExpenditureDTO> r = expenditureService.get(e.getId());
-        Assertions.assertTrue(r.isPresent());
-        assertThat(r.get()).usingRecursiveComparison().isEqualTo(e);
+        when(expenditureRepository.findById(e.getId())).thenReturn(Optional.of(e));
+        when(genericMapper.convertToDto(Optional.of(e), ExpenditureDTO.class)).thenReturn(eDTO);
+        Optional<ExpenditureDTO> result = expenditureService.get(e.getId());
+        assertEquals(Optional.of(eDTO), result);
+        verify(expenditureRepository).findById(e.getId());
+        verify(genericMapper).convertToDto(Optional.of(e), ExpenditureDTO.class);
     }
 
     @Test
     void put(){
-        when(expenditureRepository.findById(e.getId())).thenReturn(Optional.ofNullable(e));
-        when(expenditureRepository.existsByNameAndIdNot(newE.getName(),e.getId())).thenReturn(false);
-        ExpenditureDTO r = expenditureService.put(e.getId(), newE);
-        verify(expenditureRepository, times(1)).save(newE);
-        assertThat(r).usingRecursiveComparison().isEqualTo(newE);
+        when(expenditureRepository.findById(e.getId())).thenReturn(Optional.of(e));
+        when(expenditureRepository.existsByNameAndIdNot(anyString(), anyLong())).thenReturn(false);
+        when(expenditureRepository.save(any(ExpenditureModel.class))).thenReturn(newE);
+        when(genericMapper.convertToDto(newE, ExpenditureDTO.class)).thenReturn(eDTO);
+        ExpenditureDTO result = expenditureService.put(e.getId(), newE);
+        assertEquals(eDTO, result);
+        verify(expenditureRepository).findById(e.getId());
+        verify(expenditureRepository).existsByNameAndIdNot(newE.getName(), e.getId());
+        verify(expenditureRepository).save(newE);
+        verify(genericMapper).convertToDto(newE, ExpenditureDTO.class);
     }
 
     @Test
