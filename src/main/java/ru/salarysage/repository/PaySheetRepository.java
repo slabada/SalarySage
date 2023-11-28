@@ -11,8 +11,5 @@ import java.util.Optional;
 @Repository
 public interface PaySheetRepository extends JpaRepository<PaySheetModel, Long> {
 
-    List<PaySheetDTO> findAllByEmployeeId_Id(long id);
-
-    Optional<PaySheetDTO> findById(long id);
-
+    List<PaySheetModel> findAllByEmployeeId_Id(long id);
 }

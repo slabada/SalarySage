@@ -200,7 +200,7 @@ class PaySheetServiceTest {
 
     @Test
     void get(){
-        when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(psDTO));
+        when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(ps));
         Optional<PaySheetDTO> rps = paySheetService.get(ps.getId());
         assertTrue(rps.isPresent());
         assertThat(rps.get()).usingRecursiveComparison().isEqualTo(ps);
@@ -208,7 +208,7 @@ class PaySheetServiceTest {
 
     @Test
     void put(){
-        when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(psDTO));
+        when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(ps));
         when(employeeService.get(newps.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
         when(timeSheetService.searchByYearAndMonth(
                 newps.getEmployeeId().getId(),
@@ -229,14 +229,14 @@ class PaySheetServiceTest {
 
     @Test
     void delete(){
-        when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(psDTO));
+        when(paySheetRepository.findById(ps.getId())).thenReturn(Optional.of(ps));
         paySheetService.delete(ps.getId());
         verify(paySheetRepository, times(1)).findById(ps.getId());
     }
 
     @Test
     void getByEmployeeId(){
-        when(paySheetRepository.findAllByEmployeeId_Id(ps.getId())).thenReturn(List.of(psDTO));
+        when(paySheetRepository.findAllByEmployeeId_Id(ps.getId())).thenReturn(List.of(ps));
         List<PaySheetDTO> rps = paySheetService.getAll(ps.getId());
         assertThat(rps).usingRecursiveComparison().isEqualTo(List.of(ps));
     }

@@ -93,16 +93,33 @@ public class PaySheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetDTO> ps = paySheetRepository.findById(id);
+        Optional<PaySheetModel> ps = paySheetRepository.findById(id);
         if(ps.isEmpty()) {
             throw new PaySheetException.PaySheetNotFount();
         }
+
         PaySheetDTO psDTO = new PaySheetDTO(
                 ps.get().getYear(),
                 ps.get().getMonth(),
-                ps.get().getEmployeeId(),
-                ps.get().getBenefit(),
-                ps.get().getRate(),
+                new EmployeeDTO(
+                        ps.get().getEmployeeId().getFirstName(),
+                        ps.get().getEmployeeId().getLastName(),
+                        ps.get().getEmployeeId().getAddress(),
+                        new PositionDTO(
+                                ps.get().getEmployeeId().getPosition().getName(),
+                                ps.get().getEmployeeId().getPosition().getRate()
+                        )
+                ),
+                ps.get().getBenefit().stream()
+                                .map(benefitModel -> new BenefitDTO(
+                                        benefitModel.getName(),
+                                        benefitModel.getAmount()
+                                )).collect(Collectors.toSet()),
+                ps.get().getRate().stream()
+                        .map(rateModel -> new RateDTO(
+                                rateModel.getName(),
+                                rateModel.getPercent()
+                        )).collect(Collectors.toSet()),
                 ps.get().getTotalAmount()
         );
         return Optional.of(psDTO);
@@ -111,7 +128,7 @@ public class PaySheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetDTO> psDb = paySheetRepository.findById(id);
+        Optional<PaySheetModel> psDb = paySheetRepository.findById(id);
         if(psDb.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
@@ -170,7 +187,7 @@ public class PaySheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetDTO> ps = paySheetRepository.findById(id);
+        Optional<PaySheetModel> ps = paySheetRepository.findById(id);
         if(ps.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
@@ -181,10 +198,35 @@ public class PaySheetService {
             throw new GeneraleException.InvalidIdException();
         }
         // Поиск расчетных листков для данного сотрудника.
-        List<PaySheetDTO> ps = paySheetRepository.findAllByEmployeeId_Id(id);
+        List<PaySheetModel> ps = paySheetRepository.findAllByEmployeeId_Id(id);
         if(ps.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
-        return ps;
+        List<PaySheetDTO> psDTO = ps.stream()
+                .map(paySheetModel -> new PaySheetDTO(
+                        paySheetModel.getYear(),
+                        paySheetModel.getMonth(),
+                        new EmployeeDTO(
+                                paySheetModel.getEmployeeId().getFirstName(),
+                                paySheetModel.getEmployeeId().getLastName(),
+                                paySheetModel.getEmployeeId().getAddress(),
+                                new PositionDTO(
+                                        paySheetModel.getEmployeeId().getPosition().getName(),
+                                        paySheetModel.getEmployeeId().getPosition().getRate()
+                                )
+                        ),
+                        paySheetModel.getBenefit().stream()
+                                .map(benefitModel -> new BenefitDTO(
+                                        benefitModel.getName(),
+                                        benefitModel.getAmount()
+                                )).collect(Collectors.toSet()),
+                        paySheetModel.getRate().stream()
+                                .map(rateModel -> new RateDTO(
+                                        rateModel.getName(),
+                                        rateModel.getPercent()
+                                )).collect(Collectors.toSet()),
+                        paySheetModel.getTotalAmount()
+                )).toList();
+        return psDTO;
     }
 }
