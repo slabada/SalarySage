@@ -3,6 +3,7 @@ package ru.salarysage.controllers;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.salarysage.dto.PaySheetDTO;
 import ru.salarysage.models.PaySheetModel;
 import ru.salarysage.service.PaySheetService;
 
@@ -21,19 +22,19 @@ public class PaySheetController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public PaySheetModel create(@RequestBody @Valid PaySheetModel ps){
+    public PaySheetDTO create(@RequestBody @Valid PaySheetModel ps){
         return paySheetService.create(ps);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<PaySheetModel> create(@PathVariable long id){
+    public Optional<PaySheetDTO> create(@PathVariable long id){
         return paySheetService.get(id);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PaySheetModel put(@PathVariable long id, @RequestBody @Valid PaySheetModel ps){
+    public PaySheetDTO put(@PathVariable long id, @RequestBody @Valid PaySheetModel ps){
         return paySheetService.put(id,ps);
     }
 
@@ -45,7 +46,7 @@ public class PaySheetController {
 
     @GetMapping("/employee/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public List<PaySheetModel> getByEmployeeId(@PathVariable long id){
+    public List<PaySheetDTO> getByEmployeeId(@PathVariable long id){
         return paySheetService.getAll(id);
     }
 }

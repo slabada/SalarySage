@@ -1,6 +1,8 @@
 package ru.salarysage.util;
 
 import org.springframework.stereotype.Component;
+import ru.salarysage.dto.PositionDTO;
+import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.models.*;
 
 import java.math.BigDecimal;
@@ -24,7 +26,7 @@ public class CalculationUtil {
     // Среднее количество дней
     private static final float AVERAGE_WORKING_DAYS = 29.3f;
     // Метод для расчета общей суммы
-    public BigDecimal calculationTotal(List<TimeSheetModel> timeSheetList, PositionModel position, PaySheetModel paySheet) {
+    public BigDecimal calculationTotal(List<TimeSheetDTO> timeSheetList, PositionDTO position, PaySheetModel paySheet) {
         // Получение первого дня месяца
         LocalDate firstDayOfMonth = getFirstDayOfMonth(timeSheetList);
         // Получение последнего дня месяца
@@ -56,7 +58,7 @@ public class CalculationUtil {
         return totalResult.subtract(medicalDeduction).subtract(totalVacation).setScale(2, RoundingMode.HALF_UP);
     }
     // Получение первого дня месяца из временного листа
-    private LocalDate getFirstDayOfMonth(List<TimeSheetModel> timeSheetList) {
+    private LocalDate getFirstDayOfMonth(List<TimeSheetDTO> timeSheetList) {
         return LocalDate.of(timeSheetList.get(0).getDate().getYear(),
                 timeSheetList.get(0).getDate().getMonth(),
                 1);
@@ -74,9 +76,9 @@ public class CalculationUtil {
                 .count();
     }
     // Расчет общего числа больничных дней
-    private int calculateMedicalDays(List<TimeSheetModel> timeSheetList) {
+    private int calculateMedicalDays(List<TimeSheetDTO> timeSheetList) {
         return (int) timeSheetList.stream()
-                .filter(TimeSheetModel::isMedical)
+                .filter(TimeSheetDTO::isMedical)
                 .count();
     }
     // Расчет дневной зарплаты
@@ -91,9 +93,9 @@ public class CalculationUtil {
                         2, RoundingMode.HALF_UP);
     }
     // Считаем количество дней отпускных
-    private int calculationVacationDay(List<TimeSheetModel> timeSheetList){
+    private int calculationVacationDay(List<TimeSheetDTO> timeSheetList){
         return (int) timeSheetList.stream()
-                .filter(TimeSheetModel::isVacation)
+                .filter(TimeSheetDTO::isVacation)
                 .count();
     }
     // Считаем итоговую сумму отпускных
@@ -106,28 +108,28 @@ public class CalculationUtil {
                 .multiply(BigDecimal.valueOf(totalMedicalDay));
     }
     // Расчет общего числа отработанных часов в выходные
-    private double calculateTotalHoursWorkedWeekend(List<TimeSheetModel> timeSheetList) {
+    private double calculateTotalHoursWorkedWeekend(List<TimeSheetDTO> timeSheetList) {
         return timeSheetList.stream()
-                .filter(TimeSheetModel::isHoliday)
+                .filter(TimeSheetDTO::isHoliday)
                 .mapToDouble(this::calculateWeekendHours)
                 .sum();
     }
     // Расчет часов отработки в выходные
-    private double calculateWeekendHours(TimeSheetModel timeSheet) {
+    private double calculateWeekendHours(TimeSheetDTO timeSheet) {
         int hoursWorked = timeSheet.getHoursWorked().toLocalTime().getHour();
         int minutesWorked = timeSheet.getHoursWorked().toLocalTime().getMinute();
         double totalMinutes = hoursWorked * 60 + minutesWorked;
         return totalMinutes / 60 * WEEKEND_MULTIPLIER;
     }
     // Расчет общего числа отработанных часов
-    private double calculateTotalHoursWorked(List<TimeSheetModel> timeSheetList) {
+    private double calculateTotalHoursWorked(List<TimeSheetDTO> timeSheetList) {
         return timeSheetList.stream()
                 .filter(timeSheetModel -> !timeSheetModel.isHoliday())
                 .mapToDouble(this::calculateRegularAndOvertimeHours)
                 .sum();
     }
     // Расчет часов отработки (обычных и в переработках)
-    private double calculateRegularAndOvertimeHours(TimeSheetModel timeSheet) {
+    private double calculateRegularAndOvertimeHours(TimeSheetDTO timeSheet) {
         int hoursWorked = timeSheet.getHoursWorked().toLocalTime().getHour();
         int minutesWorked = timeSheet.getHoursWorked().toLocalTime().getMinute();
         double totalMinutes = hoursWorked * 60 + minutesWorked;

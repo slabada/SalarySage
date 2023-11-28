@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import ru.salarysage.dto.EmployeeDTO;
 import ru.salarysage.models.EmployeeModel;
 
 import java.util.List;
@@ -20,5 +21,5 @@ public interface EmployeeRepository extends JpaRepository<EmployeeModel, Long> {
     and (:#{#filter.address} IS NULL OR x.address = :#{#filter.address})
     and (:#{#filter.position} IS NULL OR x.position = :#{#filter.position})
     """)
-    List<EmployeeModel> search(@Param("filter") EmployeeModel employee, PageRequest page);
+    List<EmployeeDTO> search(@Param("filter") EmployeeModel employee, PageRequest page);
 }

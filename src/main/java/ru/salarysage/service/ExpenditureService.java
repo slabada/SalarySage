@@ -1,8 +1,13 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.EmployeeDTO;
+import ru.salarysage.dto.ExpenditureDTO;
+import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
+import ru.salarysage.exception.PositionException;
+import ru.salarysage.models.EmployeeModel;
 import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.models.ProjectModel;
 import ru.salarysage.repository.ExpenditureRepository;
@@ -19,15 +24,19 @@ public class ExpenditureService {
         this.expenditureRepository = expenditureRepository;
     }
 
-    public ExpenditureModel create(ExpenditureModel e){
+    public ExpenditureDTO create(ExpenditureModel e){
         boolean eDb = expenditureRepository.existsByName(e.getName());
         if(eDb){
             throw new ExpenditureException.ConflictName();
         }
         expenditureRepository.save(e);
-        return e;
+        ExpenditureDTO eDTO = new ExpenditureDTO(
+                e.getName(),
+                e.getAmount()
+        );
+        return eDTO;
     }
-    public Optional<ExpenditureModel> get(long id){
+    public Optional<ExpenditureDTO> get(long id){
         if(id <= 0) {
             throw new GeneraleException.InvalidIdException();
         }
@@ -35,9 +44,13 @@ public class ExpenditureService {
         if(eDb.isEmpty()){
             throw new ExpenditureException.NoExpenditure();
         }
-        return eDb;
+        ExpenditureDTO eDTO = new ExpenditureDTO(
+                eDb.get().getName(),
+                eDb.get().getAmount()
+        );
+        return Optional.of(eDTO);
     }
-    public ExpenditureModel put(long id, ExpenditureModel e){
+    public ExpenditureDTO put(long id, ExpenditureModel e){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -51,7 +64,11 @@ public class ExpenditureService {
         }
         e.setId(id);
         expenditureRepository.save(e);
-        return e;
+        ExpenditureDTO eDTO = new ExpenditureDTO(
+                e.getName(),
+                e.getAmount()
+        );
+        return eDTO;
     }
     public void delete(long id){
         if(id <= 0){
@@ -71,6 +88,7 @@ public class ExpenditureService {
                     .map(ExpenditureModel::getId)
                     .toList();
             List<ExpenditureModel> bDb = expenditureRepository.findAllById(b);
+
             result.addAll(bDb);
         }
         return result;

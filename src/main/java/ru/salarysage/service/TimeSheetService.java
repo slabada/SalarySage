@@ -1,16 +1,20 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.EmployeeDTO;
+import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.TimeSheetException;
 import ru.salarysage.models.EmployeeModel;
+import ru.salarysage.models.PositionModel;
 import ru.salarysage.models.TimeSheetModel;
 import ru.salarysage.repository.TimeSheetRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TimeSheetService {
@@ -22,20 +26,29 @@ public class TimeSheetService {
         this.employeeService = employeeService;
     }
 
-    public TimeSheetModel create(TimeSheetModel t){
+    public TimeSheetDTO create(TimeSheetModel t){
         boolean tDb = timeSheetRepository.existsByDateAndEmployeeId(t.getDate(), t.getEmployeeId());
         if(tDb){
             throw new TimeSheetException.DateException();
         }
-        Optional<EmployeeModel> e = employeeService.get(t.getEmployeeId().getId());
+        Optional<EmployeeDTO> e = employeeService.get(t.getEmployeeId().getId());
         if(e.isEmpty()){
             throw new  EmployeeException.EmployeeNotFoundException();
         }
-        t.setEmployeeId(e.get());
+        t.setEmployeeId(new EmployeeModel(t.getEmployeeId().getId()));
         timeSheetRepository.save(t);
-        return t;
+        TimeSheetDTO tDTO = new TimeSheetDTO(
+                t.getDate(),
+                e.get(),
+                t.getHoursWorked(),
+                t.isHoliday(),
+                t.isMedical(),
+                t.isVacation(),
+                t.getNotes()
+        );
+        return tDTO;
     }
-    public Optional<TimeSheetModel> get(long id){
+    public Optional<TimeSheetDTO> get(long id){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -43,9 +56,22 @@ public class TimeSheetService {
         if(t.isEmpty()){
             throw new TimeSheetException.NullTimeSheetException();
         }
-        return t;
+        Optional<EmployeeDTO> e = employeeService.get(t.get().getEmployeeId().getId());
+        if(e.isEmpty()){
+            throw new  EmployeeException.EmployeeNotFoundException();
+        }
+        TimeSheetDTO tDTO = new TimeSheetDTO(
+                t.get().getDate(),
+                e.get(),
+                t.get().getHoursWorked(),
+                t.get().isHoliday(),
+                t.get().isMedical(),
+                t.get().isVacation(),
+                t.get().getNotes()
+        );
+        return Optional.of(tDTO);
     }
-    public TimeSheetModel put(long id, TimeSheetModel t){
+    public TimeSheetDTO put(long id, TimeSheetModel t){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -57,14 +83,23 @@ public class TimeSheetService {
         if(dDb){
             throw new TimeSheetException.DateException();
         }
-        Optional<EmployeeModel> e = employeeService.get(t.getEmployeeId().getId());
+        Optional<EmployeeDTO> e = employeeService.get(t.getEmployeeId().getId());
         if(e.isEmpty()){
             throw new  EmployeeException.EmployeeNotFoundException();
         }
         t.setId(id);
-        t.setEmployeeId(e.get());
+        t.setEmployeeId(new EmployeeModel(t.getEmployeeId().getId()));
         timeSheetRepository.save(t);
-        return t;
+        TimeSheetDTO tDTO = new TimeSheetDTO(
+                t.getDate(),
+                e.get(),
+                t.getHoursWorked(),
+                t.isHoliday(),
+                t.isMedical(),
+                t.isVacation(),
+                t.getNotes()
+        );
+        return tDTO;
     }
     public void delete(long id){
         if(id <= 0){
@@ -76,7 +111,7 @@ public class TimeSheetService {
         }
         timeSheetRepository.deleteById(id);
     }
-    public List<TimeSheetModel> searchByYearAndMonth(long id, Integer year, Byte month){
+    public List<TimeSheetDTO> searchByYearAndMonth(long id, Integer year, Byte month){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -86,7 +121,7 @@ public class TimeSheetService {
         if(month == null){
             month = (byte) LocalDate.now().getMonth().getValue();
         }
-        Optional<EmployeeModel> e = employeeService.get(id);
+        Optional<EmployeeDTO> e = employeeService.get(id);
         if(e.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
@@ -95,13 +130,24 @@ public class TimeSheetService {
         if(t.isEmpty()) {
             throw new TimeSheetException.NullTimeSheetException();
         }
-        return t;
+        List<TimeSheetDTO> tDTO = t.stream()
+                .map(timeSheetModel -> new TimeSheetDTO(
+                        timeSheetModel.getDate(),
+                        e.get(),
+                        timeSheetModel.getHoursWorked(),
+                        timeSheetModel.isHoliday(),
+                        timeSheetModel.isMedical(),
+                        timeSheetModel.isVacation(),
+                        timeSheetModel.getNotes()
+                ))
+                .toList();
+        return tDTO;
     }
-    public List<TimeSheetModel> getAll(long id){
+    public List<TimeSheetDTO> getAll(long id){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        List<TimeSheetModel> t = timeSheetRepository.findAllByEmployeeId_Id(id);
+        List<TimeSheetDTO> t = timeSheetRepository.findAllByEmployeeId_Id(id);
         if(t.isEmpty()){
             throw new TimeSheetException.NullTimeSheetException();
         }

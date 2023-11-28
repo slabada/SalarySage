@@ -85,8 +85,8 @@
     <div class="dropdown">
         <button>Скачать</button>
         <div class="dropdown-content">
-            <a th:href="@{/report/paysheet/{id}/downloads/word(id = ${Employee.get().getId()})}" target="_blank">Скачать Word</a>
-            <a th:href="@{/report/paysheet/{id}/downloads/excel(id = ${Employee.get().getId()})}" target="_blank">Скачать Excel</a>
+            <a th:href="@{/report/paysheet/{id}/downloads/word(id = ${Employee_id})}" target="_blank">Скачать Word</a>
+            <a th:href="@{/report/paysheet/{id}/downloads/excel(id = ${Employee_id})}" target="_blank">Скачать Excel</a>
         </div>
     </div>
     <table class="table">

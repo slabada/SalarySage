@@ -5,8 +5,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.models.TimeSheetModel;
-import ru.salarysage.service.DocumentsService;
+//import ru.salarysage.service.DocumentsService;
 import ru.salarysage.service.TimeSheetService;
 
 import java.io.IOException;
@@ -25,19 +26,19 @@ public class TimeSheetController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public TimeSheetModel create(@RequestBody @Valid TimeSheetModel t){
+    public TimeSheetDTO create(@RequestBody @Valid TimeSheetModel t){
         return timeSheetService.create(t);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<TimeSheetModel> get(@PathVariable long id){
+    public Optional<TimeSheetDTO> get(@PathVariable long id){
         return timeSheetService.get(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TimeSheetModel put(@PathVariable long id, @RequestBody @Valid TimeSheetModel t){
+    public TimeSheetDTO put(@PathVariable long id, @RequestBody @Valid TimeSheetModel t){
         return timeSheetService.put(id, t);
     }
 
@@ -49,7 +50,7 @@ public class TimeSheetController {
 
     @GetMapping("/employee/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public List<TimeSheetModel> searchByYearAndMonth(@PathVariable long id,
+    public List<TimeSheetDTO> searchByYearAndMonth(@PathVariable long id,
                                                      @RequestParam(required = false) Integer year,
                                                      @RequestParam(required = false) Byte month){
         return timeSheetService.searchByYearAndMonth(id,year,month);
@@ -57,7 +58,7 @@ public class TimeSheetController {
 
     @GetMapping("/all/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public List<TimeSheetModel> getAll(@PathVariable long id){
+    public List<TimeSheetDTO> getAll(@PathVariable long id){
         return timeSheetService.getAll(id);
     }
 }

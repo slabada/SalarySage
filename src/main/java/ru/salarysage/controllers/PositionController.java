@@ -3,6 +3,7 @@ package ru.salarysage.controllers;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.models.PositionModel;
 import ru.salarysage.service.PositionService;
 
@@ -21,21 +22,21 @@ public class PositionController {
     // Обработчик HTTP POST запроса для создания новой должности
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public PositionModel create(@RequestBody @Valid PositionModel p){
+    public PositionDTO create(@RequestBody @Valid PositionModel p){
         return positionService.create(p);
     }
 
     // Обработчик HTTP GET запроса для получения информации о должности по ее идентификатору
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<PositionModel> get(@PathVariable long id){
+    public Optional<PositionDTO> get(@PathVariable long id){
         return positionService.get(id);
     }
 
     // Обработчик HTTP PUT запроса для обновления информации о должности по ее идентификатору
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PositionModel put(@PathVariable long id,@RequestBody @Valid PositionModel position){
+    public PositionDTO put(@PathVariable long id,@RequestBody @Valid PositionModel position){
         return positionService.put(id, position);
     }
 

@@ -1,13 +1,15 @@
 package ru.salarysage.service;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.*;
 import ru.salarysage.exception.*;
-import ru.salarysage.models.*;
 import ru.salarysage.util.CalculationAnalyticsUtil;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,14 +48,14 @@ public class DocumentsService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ProjectModel> p = projectService.get(id);
+        Optional<ProjectDTO> p = projectService.get(id);
         if (p.isEmpty()) {
             throw new ProjectException.NoProject();
         }
         // Создание объекта XWPFDocument, представляющего Word документ
         XWPFDocument document = new XWPFDocument();
         // Генерация содержимого документа: информация о проекте, участниках разработки, дополнительные расходы
-        createProjectInfo(document, p.get());
+        createProjectInfo(document, p.get(), id);
         createDevelopersTable(document, p.get());
         createExpenditureTable(document, p.get());
         // Преобразование документа в массив байт
@@ -76,7 +78,7 @@ public class DocumentsService {
         run.addBreak();
     }
     // Вспомогательный метод для создания информации о проекте в Word документе
-    private void createProjectInfo(XWPFDocument document, ProjectModel project) {
+    private void createProjectInfo(XWPFDocument document, ProjectDTO project, long id) {
         XWPFParagraph paragraph = document.createParagraph();
         XWPFRun run = paragraph.createRun();
 
@@ -90,11 +92,11 @@ public class DocumentsService {
 
         paragraph = document.createParagraph();
         run = paragraph.createRun();
-        run.setText("Бюджет проекта: " + calculationAnalyticsUtil.calculationTotal(project.getId()));
+        run.setText("Бюджет проекта: " + calculationAnalyticsUtil.calculationTotal(id));
         setRunStyle(run);
     }
     // Вспомогательный метод для создания таблицы участников разработки в Word документе
-    private void createDevelopersTable(XWPFDocument document, ProjectModel project) {
+    private void createDevelopersTable(XWPFDocument document, ProjectDTO project) {
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph developersParagraph = document.createParagraph();
         XWPFRun developersRun = developersParagraph.createRun();
@@ -111,8 +113,8 @@ public class DocumentsService {
         headerRowEmployee.getCell(1).setText("Должность");
         headerRowEmployee.getCell(2).setText("Оклад");
         // Получение списка участников разработки и заполнение данных в таблицу
-        Set<EmployeeModel> employees = project.getEmployees();
-        for (EmployeeModel employee : employees) {
+        Set<EmployeeDTO> employees = project.getEmployees();
+        for (EmployeeDTO employee : employees) {
             if (employee != null) {
                 XWPFTableRow dataRow = developersTable.createRow();
                 dataRow.getCell(0).setText(employee.getLastName() + " " + employee.getFirstName());
@@ -122,7 +124,7 @@ public class DocumentsService {
         }
     }
     // Вспомогательный метод для создания таблицы дополнительных расходов в Word документе
-    private void createExpenditureTable(XWPFDocument document, ProjectModel project) {
+    private void createExpenditureTable(XWPFDocument document, ProjectDTO project) {
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph expenditureParagraph = document.createParagraph();
         XWPFRun expenditureRun = expenditureParagraph.createRun();
@@ -139,8 +141,8 @@ public class DocumentsService {
         headerRowExpenditure.getCell(0).setText("Название");
         headerRowExpenditure.getCell(1).setText("Сумма");
         // Получение списка дополнительных расходов и заполнение данных в таблицу
-        Set<ExpenditureModel> expenditures = project.getExpenditure();
-        for (ExpenditureModel expenditure : expenditures) {
+        Set<ExpenditureDTO> expenditures = project.getExpenditure();
+        for (ExpenditureDTO expenditure : expenditures) {
             XWPFTableRow dataRow = expenditureTable.createRow();
             dataRow.getCell(0).setText(expenditure.getName());
             dataRow.getCell(1).setText(expenditure.getAmount().toString());
@@ -151,7 +153,7 @@ public class DocumentsService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ProjectModel> p = projectService.get(id);
+        Optional<ProjectDTO> p = projectService.get(id);
         if (p.isEmpty()) {
             throw new ProjectException.NoProject();
         }
@@ -175,7 +177,7 @@ public class DocumentsService {
         return documentBytes;
     }
     // Вспомогательный метод для создания информации о проекте в Excel документе
-    private void createExcelProjectInfo(long id,Workbook workbook, ProjectModel project) {
+    private void createExcelProjectInfo(long id,Workbook workbook, ProjectDTO project) {
         // Создание листа с названием "Общая информация"
         Sheet sheet = workbook.createSheet("Общая информация");
         // Создание строки заголовка
@@ -190,7 +192,7 @@ public class DocumentsService {
         dataRow.createCell(2).setCellValue(calculationAnalyticsUtil.calculationTotal(id).doubleValue());
     }
     // Вспомогательный метод для создания листа с информацией о разработчиках в Excel документе
-    private void createExcelDevelopersSheet(Workbook workbook, ProjectModel project) {
+    private void createExcelDevelopersSheet(Workbook workbook, ProjectDTO project) {
         // Создание листа с названием "Разработчики"
         Sheet sheet = workbook.createSheet("Разработчики");
         // Создание строки заголовка
@@ -199,9 +201,9 @@ public class DocumentsService {
         headerRow.createCell(1).setCellValue("Должность");
         headerRow.createCell(2).setCellValue("Оклад");
         // Получение списка участников разработки и заполнение данных в таблицу
-        Set<EmployeeModel> employees = project.getEmployees();
+        Set<EmployeeDTO> employees = project.getEmployees();
         int rowNum = 1;
-        for (EmployeeModel employee : employees) {
+        for (EmployeeDTO employee : employees) {
             if (employee != null) {
                 Row dataRow = sheet.createRow(rowNum++);
                 dataRow.createCell(0).setCellValue(employee.getLastName() + " " + employee.getFirstName());
@@ -211,7 +213,7 @@ public class DocumentsService {
         }
     }
     // Вспомогательный метод для создания листа с информацией о дополнительных расходах в Excel документе
-    private void createExcelExpenditureSheet(Workbook workbook, ProjectModel project) {
+    private void createExcelExpenditureSheet(Workbook workbook, ProjectDTO project) {
         // Создание листа с названием "Доп.расходы"
         Sheet sheet = workbook.createSheet("Доп.расходы");
         // Создание строки заголовка
@@ -219,9 +221,9 @@ public class DocumentsService {
         headerRow.createCell(0).setCellValue("Название");
         headerRow.createCell(1).setCellValue("Сумма");
         // Получение списка дополнительных расходов и заполнение данных в таблицу
-        Set<ExpenditureModel> expenditures = project.getExpenditure();
+        Set<ExpenditureDTO> expenditures = project.getExpenditure();
         int rowNum = 1;
-        for (ExpenditureModel expenditure : expenditures) {
+        for (ExpenditureDTO expenditure : expenditures) {
             Row dataRow = sheet.createRow(rowNum++);
             dataRow.createCell(0).setCellValue(expenditure.getName());
             dataRow.createCell(1).setCellValue(expenditure.getAmount().doubleValue());
@@ -232,11 +234,11 @@ public class DocumentsService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        List<TimeSheetModel> t = timeSheetService.getAll(id);
+        List<TimeSheetDTO> t = timeSheetService.getAll(id);
         if (t.isEmpty()){
             throw new TimeSheetException.NullTimeSheetException();
         }
-        Optional<EmployeeModel> e = employeeService.get(id);
+        Optional<EmployeeDTO> e = employeeService.get(id);
         if(e.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
@@ -258,7 +260,7 @@ public class DocumentsService {
         return documentBytes;
     }
     // Вспомогательный метод для создания таблицы табеля времени word
-    private void createTimeSheetTable(XWPFDocument document, List<TimeSheetModel> t, EmployeeModel e) {
+    private void createTimeSheetTable(XWPFDocument document, List<TimeSheetDTO> t, EmployeeDTO e) {
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph timeSheetParagraph = document.createParagraph();
         XWPFRun timeSheetRun = timeSheetParagraph.createRun();
@@ -279,7 +281,7 @@ public class DocumentsService {
         headerRowTimeSheet.getCell(4).setText("Отпуск");
         headerRowTimeSheet.getCell(5).setText("Примечание");
 
-        for (TimeSheetModel times : t){
+        for (TimeSheetDTO times : t){
             XWPFTableRow dataRow = timeSheetTable.createRow();
             dataRow.getCell(0).setText(times.getDate().toString());
             dataRow.getCell(1).setText(times.getHoursWorked().toString());
@@ -294,11 +296,11 @@ public class DocumentsService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        List<TimeSheetModel> t = timeSheetService.getAll(id);
+        List<TimeSheetDTO> t = timeSheetService.getAll(id);
         if (t.isEmpty()){
             throw new TimeSheetException.NullTimeSheetException();
         }
-        Optional<EmployeeModel> e = employeeService.get(id);
+        Optional<EmployeeDTO> e = employeeService.get(id);
         if(e.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
@@ -320,7 +322,7 @@ public class DocumentsService {
         return documentBytes;
     }
     // Вспомогательный метод для создания таблицы табеля времени excel
-    private void createTimeSheetSheet(Workbook workbook, List<TimeSheetModel> t, EmployeeModel e) {
+    private void createTimeSheetSheet(Workbook workbook, List<TimeSheetDTO> t, EmployeeDTO e) {
         Sheet sheet = workbook.createSheet(e.getFirstName() + ' ' + e.getLastName());
         // Создание строки заголовка
         Row headerRow = sheet.createRow(0);
@@ -333,7 +335,7 @@ public class DocumentsService {
         // Заполнение данными
         for (int i = 0; i < t.size(); i++) {
             Row dataRow = sheet.createRow(i + 1);
-            TimeSheetModel times = t.get(i);
+            TimeSheetDTO times = t.get(i);
 
             dataRow.createCell(0).setCellValue(times.getDate().toString());
             dataRow.createCell(1).setCellValue(times.getHoursWorked().toString());
@@ -348,11 +350,11 @@ public class DocumentsService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        List<PaySheetModel> p = paySheetService.getAll(id);
+        List<PaySheetDTO> p = paySheetService.getAll(id);
         if (p.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
-        Optional<EmployeeModel> e = employeeService.get(id);
+        Optional<EmployeeDTO> e = employeeService.get(id);
         if(e.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
@@ -374,7 +376,7 @@ public class DocumentsService {
         return documentBytes;
     }
     // Вспомогательный метод для создания таблицы табеля времени word
-    private void createPaySheetTable(XWPFDocument document, List<PaySheetModel> p, EmployeeModel e) {
+    private void createPaySheetTable(XWPFDocument document, List<PaySheetDTO> p, EmployeeDTO e) {
         // Создание параграфа и объекта XWPFRun для заголовка таблицы
         XWPFParagraph paySheetParagraph = document.createParagraph();
         XWPFRun paySheetRun = paySheetParagraph.createRun();
@@ -395,7 +397,7 @@ public class DocumentsService {
         headerRowPaySheet.getCell(4).setText("Налоги");
         headerRowPaySheet.getCell(5).setText("Итоговая сумма");
 
-        for (PaySheetModel paySheets : p){
+        for (PaySheetDTO paySheets : p){
             XWPFTableRow dataRow = paySheetTable.createRow();
             dataRow.getCell(0).setText(paySheets.getYear() + " - " + paySheets.getMonth());
             dataRow.getCell(1).setText(paySheets.getEmployeeId().getPosition().getName());
@@ -403,13 +405,13 @@ public class DocumentsService {
             dataRow.getCell(3).setText(
                     paySheets.getBenefit()
                             .stream()
-                            .map(BenefitModel::getName)
+                            .map(BenefitDTO::getName)
                             .collect(Collectors.joining(", "))
             );
             dataRow.getCell(4).setText(
                     paySheets.getRate()
                             .stream()
-                            .map(RateModel::getName)
+                            .map(RateDTO::getName)
                             .collect(Collectors.joining(", "))
             );
             dataRow.getCell(5).setText(paySheets.getTotalAmount().toString());
@@ -421,12 +423,12 @@ public class DocumentsService {
             throw new GeneraleException.InvalidIdException();
         }
         // Получение проекта по идентификатору
-        List<PaySheetModel> p = paySheetService.getAll(id);
+        List<PaySheetDTO> p = paySheetService.getAll(id);
         // Обработка случая, если проект не найден
         if (p.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
-        Optional<EmployeeModel> e = employeeService.get(id);
+        Optional<EmployeeDTO> e = employeeService.get(id);
         if(e.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
@@ -448,7 +450,7 @@ public class DocumentsService {
         return documentBytes;
     }
     // Вспомогательный метод для создания таблицы табеля времени excel
-    private static void createExcelPaySheet(Workbook workbook, List<PaySheetModel> paySheets, EmployeeModel employee) {
+    private static void createExcelPaySheet(Workbook workbook, List<PaySheetDTO> paySheets, EmployeeDTO employee) {
         Sheet sheet = workbook.createSheet(employee.getFirstName() + " " + employee.getLastName());
         // Создание строки заголовка
         Row headerRow = sheet.createRow(0);
@@ -461,7 +463,7 @@ public class DocumentsService {
         // Заполнение данными
         for (int i = 0; i < paySheets.size(); i++) {
             Row dataRow = sheet.createRow(i + 1);
-            PaySheetModel paySheet = paySheets.get(i);
+            PaySheetDTO paySheet = paySheets.get(i);
 
             dataRow.createCell(0).setCellValue(paySheet.getYear() + " - " + paySheet.getMonth());
             dataRow.createCell(1).setCellValue(paySheet.getEmployeeId().getPosition().getName());
@@ -469,13 +471,13 @@ public class DocumentsService {
             dataRow.createCell(3).setCellValue(
                     paySheet.getBenefit()
                             .stream()
-                            .map(BenefitModel::getName)
+                            .map(BenefitDTO::getName)
                             .collect(Collectors.joining(", "))
             );
             dataRow.createCell(4).setCellValue(
                     paySheet.getRate()
                             .stream()
-                            .map(RateModel::getName)
+                            .map(RateDTO::getName)
                             .collect(Collectors.joining(", "))
             );
             dataRow.createCell(5).setCellValue(paySheet.getTotalAmount().toString());

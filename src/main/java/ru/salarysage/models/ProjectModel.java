@@ -4,7 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.salarysage.dto.EmployeeDTO;
+import ru.salarysage.dto.ExpenditureDTO;
+import ru.salarysage.dto.PositionDTO;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;

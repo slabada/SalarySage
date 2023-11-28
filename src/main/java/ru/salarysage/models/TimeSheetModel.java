@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import ru.salarysage.dto.EmployeeDTO;
 
 import java.sql.Time;
 import java.time.LocalDate;

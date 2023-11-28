@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.salarysage.dto.BenefitDTO;
 import ru.salarysage.exception.BenefitException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.models.BenefitModel;
@@ -15,6 +16,7 @@ import ru.salarysage.repository.BenefitRepository;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -84,17 +86,17 @@ class BenefitServiceTest {
     @Test
     void get(){
         when(benefitRepository.findById(b.getId())).thenReturn(Optional.of(b));
-        Optional<BenefitModel> rb = benefitService.get(b.getId());
+        Optional<BenefitDTO> rb = benefitService.get(b.getId());
         Assertions.assertTrue(rb.isPresent());
-        assertEquals(b, rb.get());
+        assertThat(rb.get()).usingRecursiveComparison().isEqualTo(b);
     }
 
     @Test
     void put(){
         when(benefitRepository.findById(b.getId())).thenReturn(Optional.of(b));
         when(benefitRepository.existsByNameAndIdNot(newb.getName(), b.getId())).thenReturn(false);
-        BenefitModel rb = benefitService.put(b.getId(), newb);
-        assertEquals(newb, rb);
+        BenefitDTO rb = benefitService.put(b.getId(), newb);
+        assertThat(rb).usingRecursiveComparison().isEqualTo(newb);
         verify(benefitRepository, times(1)).save(newb);
     }
 

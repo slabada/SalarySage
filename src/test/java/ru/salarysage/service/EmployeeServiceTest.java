@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import ru.salarysage.dto.EmployeeDTO;
+import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
@@ -18,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -30,7 +33,9 @@ class EmployeeServiceTest {
     @Mock
     private PositionService positionService;
     private PositionModel p;
+    private PositionDTO pDTO;
     private EmployeeModel e;
+    private EmployeeDTO eDTO;
     private EmployeeModel newe;
     @BeforeEach
     void setUp() {
@@ -39,12 +44,22 @@ class EmployeeServiceTest {
         p.setName("Test");
         p.setRate(new BigDecimal(50000));
 
+        pDTO = new PositionDTO();
+        pDTO.setName("Test");
+        pDTO.setRate(BigDecimal.valueOf(50000));
+
         e = new EmployeeModel();
         e.setId(1L);
         e.setLastName("Test");
         e.setFirstName("Test");
         e.setAddress("Test");
         e.setPosition(p);
+
+        eDTO = new EmployeeDTO();
+        eDTO.setLastName("Test");
+        eDTO.setFirstName("Test");
+        eDTO.setAddress("Test");
+        eDTO.setPosition(pDTO);
 
         newe = new EmployeeModel();
         newe.setId(1L);
@@ -91,7 +106,7 @@ class EmployeeServiceTest {
 
     @Test
     void create() {
-        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.of(p));
+        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.of(pDTO));
         employeeService.create(e);
         verify(employeeRepository, times(1)).save(e);
     }
@@ -99,17 +114,18 @@ class EmployeeServiceTest {
     @Test
     void get(){
         when(employeeRepository.findById(e.getId())).thenReturn(Optional.of(e));
-        Optional<EmployeeModel> re = employeeService.get(e.getId());
+        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.of(pDTO));
+        Optional<EmployeeDTO> re = employeeService.get(e.getId());
         assertTrue(re.isPresent());
-        assertEquals(e, re.get());
+        assertThat(re.get()).usingRecursiveComparison().isEqualTo(e);
     }
 
     @Test
     void put(){
         when(employeeRepository.findById(e.getId())).thenReturn(Optional.of(e));
-        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.of(p));
-        EmployeeModel re = employeeService.put(e.getId(), newe);
-        assertEquals(newe, re);
+        when(positionService.get(e.getPosition().getId())).thenReturn(Optional.of(pDTO));
+        EmployeeDTO re = employeeService.put(e.getId(), newe);
+        assertThat(re).usingRecursiveComparison().isEqualTo(newe);
         verify(employeeRepository, times(1)).save(newe);
     }
 
@@ -122,8 +138,8 @@ class EmployeeServiceTest {
 
     @Test
     void search(){
-        when(employeeRepository.search(e, PageRequest.of(1, 1))).thenReturn(List.of(e));
-        List<EmployeeModel> re = employeeService.search(e, 1, 1);
-        assertEquals(List.of(e), re);
+        when(employeeRepository.search(e, PageRequest.of(1, 1))).thenReturn(List.of(eDTO));
+        List<EmployeeDTO> re = employeeService.search(e, 1, 1);
+        assertThat(re).usingRecursiveComparison().isEqualTo(List.of(e));
     }
 }

@@ -2,6 +2,8 @@ package ru.salarysage.util;
 
 import org.springframework.stereotype.Component;
 import ru.salarysage.controllers.ProjectController;
+import ru.salarysage.dto.ExpenditureDTO;
+import ru.salarysage.dto.ProjectDTO;
 import ru.salarysage.exception.ProjectException;
 import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.models.ProjectModel;
@@ -23,7 +25,7 @@ public class CalculationAnalyticsUtil {
 
     public BigDecimal calculationTotal(long id){
         // Ищем проект по id
-        Optional<ProjectModel> p = projectController.get(id);
+        Optional<ProjectDTO> p = projectController.get(id);
         if(p.isEmpty()){
             throw new ProjectException.NoProject();
         }
@@ -45,7 +47,7 @@ public class CalculationAnalyticsUtil {
         return budgetDay.multiply(BigDecimal.valueOf(workerDaysProject)).add(expenditure).setScale(2, RoundingMode.HALF_UP);
     }
     // Считаем бюджет на сотрудников
-    public BigDecimal calculationBudgetEmployee(Optional<ProjectModel> p){
+    public BigDecimal calculationBudgetEmployee(Optional<ProjectDTO> p){
         return p.get().getEmployees().stream()
                 .map(EmployeeModel -> EmployeeModel.getPosition().getRate())
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
@@ -86,9 +88,9 @@ public class CalculationAnalyticsUtil {
                 .count();
     }
     // Считаем бюджет на доп расходы
-    public BigDecimal calculationBudgetExpenditure(Optional<ProjectModel> p){
+    public BigDecimal calculationBudgetExpenditure(Optional<ProjectDTO> p){
         return p.get().getExpenditure().stream()
-                .map(ExpenditureModel::getAmount)
+                .map(ExpenditureDTO::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
     }

@@ -1,6 +1,7 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.*;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PaySheetException;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PaySheetService {
@@ -36,14 +38,14 @@ public class PaySheetService {
         this.calculationUtil = calculationUtil;
     }
 
-    public PaySheetModel create(PaySheetModel ps){
-        Optional<EmployeeModel> e = employeeService.get(ps.getEmployeeId().getId());
+    public PaySheetDTO create(PaySheetModel ps){
+        Optional<EmployeeDTO> e = employeeService.get(ps.getEmployeeId().getId());
         if(e.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
-        ps.setEmployeeId(e.get());
+        ps.setEmployeeId(new EmployeeModel(ps.getEmployeeId().getId()));
         // Поиск записей о рабочем времени для данного сотрудника и месяца.
-        List<TimeSheetModel> t = timeSheetService.searchByYearAndMonth(
+        List<TimeSheetDTO> t = timeSheetService.searchByYearAndMonth(
                 ps.getEmployeeId().getId(),
                 ps.getYear(),
                 (byte) ps.getMonth()
@@ -54,44 +56,72 @@ public class PaySheetService {
         // Проверка льгот для расчетного листка и установка их в расчетный листок.
         Set<BenefitModel> bc = benefitService.check(ps);
         ps.setBenefit(bc);
+        Set<BenefitDTO> bcDTO = bc.stream()
+                .map(benefitModel -> new BenefitDTO(
+                        benefitModel.getName(),
+                        benefitModel.getAmount()
+                ))
+                .collect(Collectors.toSet());
         // Проверка налог для расчетного листка и установка их в расчетный листок.
         Set<RateModel> rc = rateService.check(ps);
         ps.setRate(rc);
+        Set<RateDTO> rcDTO = rc.stream()
+                .map(rateModel -> new RateDTO(
+                        rateModel.getName(),
+                        rateModel.getPercent()
+                ))
+                .collect(Collectors.toSet());
         // Вычисление общей суммы для расчетного листка.
         BigDecimal total = calculationUtil.calculationTotal(
                 t,
-                ps.getEmployeeId().getPosition(),
+                e.get().getPosition(),
                 ps
         );
         ps.setTotalAmount(total);
         paySheetRepository.save(ps);
-        return ps;
+        PaySheetDTO psDTO = new PaySheetDTO(
+                ps.getYear(),
+                ps.getMonth(),
+                e.get(),
+                bcDTO,
+                rcDTO,
+                ps.getTotalAmount()
+        );
+        return psDTO;
     }
-    public Optional<PaySheetModel> get(long id){
+    public Optional<PaySheetDTO> get(long id){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetModel> ps = paySheetRepository.findById(id);
+        Optional<PaySheetDTO> ps = paySheetRepository.findById(id);
         if(ps.isEmpty()) {
             throw new PaySheetException.PaySheetNotFount();
         }
-        return ps;
+        PaySheetDTO psDTO = new PaySheetDTO(
+                ps.get().getYear(),
+                ps.get().getMonth(),
+                ps.get().getEmployeeId(),
+                ps.get().getBenefit(),
+                ps.get().getRate(),
+                ps.get().getTotalAmount()
+        );
+        return Optional.of(psDTO);
     }
-    public PaySheetModel put(long id, PaySheetModel ps){
+    public PaySheetDTO put(long id, PaySheetModel ps){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetModel> psDb = paySheetRepository.findById(id);
+        Optional<PaySheetDTO> psDb = paySheetRepository.findById(id);
         if(psDb.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
-        Optional<EmployeeModel> e = employeeService.get(ps.getEmployeeId().getId());
+        Optional<EmployeeDTO> e = employeeService.get(ps.getEmployeeId().getId());
         if(e.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
-        ps.setEmployeeId(e.get());
+        ps.setEmployeeId(new EmployeeModel(ps.getEmployeeId().getId()));
         // Поиск записей о рабочем времени для данного сотрудника и месяца.
-        List<TimeSheetModel> t = timeSheetService.searchByYearAndMonth(
+        List<TimeSheetDTO> t = timeSheetService.searchByYearAndMonth(
                 ps.getEmployeeId().getId(),
                 ps.getYear(),
                 (byte) ps.getMonth()
@@ -102,36 +132,56 @@ public class PaySheetService {
         // Проверка льгот для расчетного листка и установка их в расчетный листок.
         Set<BenefitModel> bc = benefitService.check(ps);
         ps.setBenefit(bc);
-        // Проверка ставок для расчетного листка и установка их в расчетный листок.
+        Set<BenefitDTO> bcDTO = bc.stream()
+                .map(benefitModel -> new BenefitDTO(
+                        benefitModel.getName(),
+                        benefitModel.getAmount()
+                ))
+                .collect(Collectors.toSet());
+        // Проверка налог для расчетного листка и установка их в расчетный листок.
         Set<RateModel> rc = rateService.check(ps);
         ps.setRate(rc);
+        Set<RateDTO> rcDTO = rc.stream()
+                .map(rateModel -> new RateDTO(
+                        rateModel.getName(),
+                        rateModel.getPercent()
+                ))
+                .collect(Collectors.toSet());
         // Вычисление общей суммы для расчетного листка.
         BigDecimal total = calculationUtil.calculationTotal(
                 t,
-                ps.getEmployeeId().getPosition(),
+                e.get().getPosition(),
                 ps
         );
         ps.setId(id);
         ps.setTotalAmount(total);
         paySheetRepository.save(ps);
-        return ps;
+        PaySheetDTO psDTO = new PaySheetDTO(
+                ps.getYear(),
+                ps.getMonth(),
+                e.get(),
+                bcDTO,
+                rcDTO,
+                ps.getTotalAmount()
+        );
+        return psDTO;
     }
     public void delete(long id){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetModel> ps = paySheetRepository.findById(id);
+        Optional<PaySheetDTO> ps = paySheetRepository.findById(id);
         if(ps.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
         paySheetRepository.deleteById(id);
     }
-    public List<PaySheetModel> getAll(long id){
+    public List<PaySheetDTO> getAll(long id){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
         // Поиск расчетных листков для данного сотрудника.
-        List<PaySheetModel> ps = paySheetRepository.findAllByEmployeeId_Id(id);
+        List<PaySheetDTO> ps = paySheetRepository.findAllByEmployeeId_Id(id);
         if(ps.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }

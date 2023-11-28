@@ -6,10 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
 import ru.salarysage.models.PositionModel;
 import ru.salarysage.repository.PositionRepository;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -74,17 +76,17 @@ class PositionServiceTest {
     @Test
     void get(){
         when(positionRepository.findById(p.getId())).thenReturn(Optional.of(p));
-        Optional<PositionModel> rp = positionService.get(p.getId());
+        Optional<PositionDTO> rp = positionService.get(p.getId());
         assertTrue(rp.isPresent());
-        assertEquals(p, rp.get());
+        assertThat(rp.get()).usingRecursiveComparison().isEqualTo(p);
     }
 
     @Test
     void put(){
         when(positionRepository.findById(p.getId())).thenReturn(Optional.of(p));
         when(positionRepository.existsByNameAndIdNot(newp.getName(), p.getId())).thenReturn(false);
-        PositionModel rp = positionService.put(p.getId(), newp);
-        assertEquals(newp, rp);
+        PositionDTO rp = positionService.put(p.getId(), newp);
+        assertThat(rp).usingRecursiveComparison().isEqualTo(newp);
         verify(positionRepository, times(1)).save(newp);
     }
 

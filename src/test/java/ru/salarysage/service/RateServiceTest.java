@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.salarysage.dto.RateDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.RateException;
 import ru.salarysage.listener.RateListener;
@@ -15,6 +16,7 @@ import ru.salarysage.event.CreateRateEvent;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -28,6 +30,8 @@ class RateServiceTest {
 
     private RateModel r;
 
+    private RateDTO rDTO;
+
     private RateModel newr;
 
     @BeforeEach
@@ -36,6 +40,10 @@ class RateServiceTest {
         r.setId(1L);
         r.setName("Test");
         r.setPercent(13);
+
+        rDTO = new RateDTO();
+        rDTO.setName("Test");
+        rDTO.setPercent(13);
 
         newr = new RateModel();
         newr.setId(1L);
@@ -81,17 +89,17 @@ class RateServiceTest {
     @Test
     void get(){
         when(rateRepository.findById(r.getId())).thenReturn(Optional.of(r));
-        Optional<RateModel> rr = rateService.get(r.getId());
+        Optional<RateDTO> rr = rateService.get(r.getId());
         assertTrue(rr.isPresent());
-        assertEquals(r, rr.get());
+        assertThat(rr.get()).usingRecursiveComparison().isEqualTo(r);
     }
 
     @Test
     void put(){
         when(rateRepository.findById(r.getId())).thenReturn(Optional.of(r));
         when(rateRepository.existsByNameAndIdNot(newr.getName(), r.getId())).thenReturn(false);
-        RateModel rr = rateService.put(r.getId(),newr);
-        assertEquals(newr,rr);
+        RateDTO rr = rateService.put(r.getId(),newr);
+        assertThat(rr).usingRecursiveComparison().isEqualTo(newr);
         verify(rateRepository, times(1)).save(newr);
     }
 

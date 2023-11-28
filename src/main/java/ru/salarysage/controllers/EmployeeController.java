@@ -3,6 +3,7 @@ package ru.salarysage.controllers;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.salarysage.dto.EmployeeDTO;
 import ru.salarysage.models.EmployeeModel;
 import ru.salarysage.service.EmployeeService;
 
@@ -22,22 +23,22 @@ public class EmployeeController {
     // Обработчик HTTP POST запроса для создания нового сотрудника
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public EmployeeModel create(@RequestBody @Valid EmployeeModel employee){
+    public EmployeeDTO create(@RequestBody @Valid EmployeeModel employee){
         return employeeService.create(employee);
     }
 
     // Обработчик HTTP GET запроса для получения информации о сотруднике по его идентификатору
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<EmployeeModel> get(@PathVariable long id){
+    public Optional<EmployeeDTO> get(@PathVariable long id){
         return employeeService.get(id);
     }
 
     // Обработчик HTTP PUT запроса для обновления информации о сотруднике по его идентификатору
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EmployeeModel put(@PathVariable long id,
-                             @RequestBody @Valid EmployeeModel employee){
+    public EmployeeDTO put(@PathVariable long id,
+                           @RequestBody @Valid EmployeeModel employee){
         return employeeService.put(id,employee);
     }
 
@@ -51,7 +52,7 @@ public class EmployeeController {
     // Обработчик HTTP GET запроса для поиска сотрудников с заданными параметрами
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<EmployeeModel> search(@ModelAttribute EmployeeModel e,
+    public List<EmployeeDTO> search(@ModelAttribute EmployeeModel e,
                                       @RequestParam(defaultValue = "0") int from,
                                       @RequestParam(defaultValue = "10") int size){
         return employeeService.search(e,from,size);

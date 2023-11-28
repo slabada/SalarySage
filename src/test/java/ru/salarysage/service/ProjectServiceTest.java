@@ -6,6 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.salarysage.dto.EmployeeDTO;
+import ru.salarysage.dto.ExpenditureDTO;
+import ru.salarysage.dto.PositionDTO;
+import ru.salarysage.dto.ProjectDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
@@ -21,7 +25,9 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,14 +43,21 @@ class ProjectServiceTest {
     private ProjectModel pr;
     private ProjectModel newpr;
     private ExpenditureModel ex;
+    private ExpenditureDTO exDTO;
     private EmployeeModel e;
+    private EmployeeDTO eDTO;
     private PositionModel p;
+    private PositionDTO pDTO;
     @BeforeEach
     void setUp() {
         p = new PositionModel();
         p.setId(1L);
         p.setName("Test");
         p.setRate(new BigDecimal(50000));
+
+        pDTO = new PositionDTO();
+        pDTO.setName("Test");
+        pDTO.setRate(new BigDecimal(50000));
 
         e = new EmployeeModel();
         e.setId(1L);
@@ -53,10 +66,20 @@ class ProjectServiceTest {
         e.setAddress("Test");
         e.setPosition(p);
 
+        eDTO = new EmployeeDTO();
+        eDTO.setLastName("Test");
+        eDTO.setFirstName("Test");
+        eDTO.setAddress("Test");
+        eDTO.setPosition(pDTO);
+
         ex = new ExpenditureModel();
         ex.setId(1L);
         ex.setName("Test");
         ex.setAmount(BigDecimal.valueOf(6666));
+
+        exDTO = new ExpenditureDTO();
+        exDTO.setName("Test");
+        exDTO.setAmount(BigDecimal.valueOf(6666));
 
         pr = new ProjectModel();
         pr.setId(1L);
@@ -125,17 +148,19 @@ class ProjectServiceTest {
         when(projectRepository.existsByName(p.getName())).thenReturn(false);
         when(employeeService.check(pr)).thenReturn(Collections.singleton(e));
         when(expenditureService.check(pr)).thenReturn(Collections.singleton(ex));
-        ProjectModel r = projectService.create(pr);
+        ProjectDTO r = projectService.create(pr);
         verify(projectRepository, times(1)).save(pr);
-        assertEquals(r, pr);
+        assertThat(r).usingRecursiveComparison().isEqualTo(pr);
     }
 
     @Test
     void get(){
         when(projectRepository.findById(pr.getId())).thenReturn(Optional.ofNullable(pr));
-        Optional<ProjectModel> r = projectService.get(pr.getId());
+        when(employeeService.check(pr)).thenReturn(Collections.singleton(e));
+        when(expenditureService.check(pr)).thenReturn(Collections.singleton(ex));
+        Optional<ProjectDTO> r = projectService.get(pr.getId());
         assertTrue(r.isPresent());
-        assertEquals(pr,r.get());
+        assertThat(r.get()).usingRecursiveComparison().isEqualTo(pr);
     }
 
     @Test
@@ -144,9 +169,9 @@ class ProjectServiceTest {
         when(projectRepository.existsByNameAndIdNot(newpr.getName(), pr.getId())).thenReturn(false);
         when(employeeService.check(newpr)).thenReturn(Collections.singleton(e));
         when(expenditureService.check(newpr)).thenReturn(Collections.singleton(ex));
-        ProjectModel r = projectService.put(pr.getId(), newpr);
+        ProjectDTO r = projectService.put(pr.getId(), newpr);
         verify(projectRepository, times(1)).save(newpr);
-        assertEquals(newpr , r);
+        assertThat(r).usingRecursiveComparison().isEqualTo(newpr);
     }
 
     @Test

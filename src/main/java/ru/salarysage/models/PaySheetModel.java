@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.salarysage.dto.EmployeeDTO;
+import ru.salarysage.dto.PositionDTO;
 
 import java.math.BigDecimal;
 import java.util.Set;

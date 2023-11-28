@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.salarysage.dto.EmployeeDTO;
+import ru.salarysage.dto.PositionDTO;
+import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.TimeSheetException;
@@ -20,6 +23,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -32,9 +36,13 @@ class TimeSheetServiceTest {
     @Mock
     private EmployeeService employeeService;
     private TimeSheetModel t;
+    private TimeSheetDTO tDTO;
     private TimeSheetModel newt;
+    private TimeSheetDTO newtDTO;
     private PositionModel p;
+    private PositionDTO pDTO;
     private EmployeeModel e;
+    private EmployeeDTO eDTO;
     @BeforeEach
     void setUp() {
         p = new PositionModel();
@@ -42,12 +50,22 @@ class TimeSheetServiceTest {
         p.setName("Test");
         p.setRate(new BigDecimal(50000));
 
+        pDTO = new PositionDTO();
+        pDTO.setName("Test");
+        pDTO.setRate(new BigDecimal(50000));
+
         e = new EmployeeModel();
         e.setId(1L);
         e.setLastName("Test");
         e.setFirstName("Test");
         e.setAddress("Test");
         e.setPosition(p);
+
+        eDTO = new EmployeeDTO();
+        eDTO.setLastName("Test");
+        eDTO.setFirstName("Test");
+        eDTO.setAddress("Test");
+        eDTO.setPosition(pDTO);
 
         t = new TimeSheetModel();
         t.setId(1L);
@@ -57,6 +75,13 @@ class TimeSheetServiceTest {
         t.setHoliday(false);
         t.setHoursWorked(Time.valueOf("8:00:00"));
 
+        tDTO = new TimeSheetDTO();
+        tDTO.setEmployeeId(eDTO);
+        tDTO.setDate(LocalDate.parse("2023-02-02"));
+        tDTO.setNotes("test");
+        tDTO.setHoliday(false);
+        tDTO.setHoursWorked(Time.valueOf("8:00:00"));
+
         newt = new TimeSheetModel();
         newt.setId(1L);
         newt.setEmployeeId(e);
@@ -64,6 +89,13 @@ class TimeSheetServiceTest {
         newt.setNotes("test");
         newt.setHoliday(false);
         newt.setHoursWorked(Time.valueOf("8:00:00"));
+
+        newtDTO = new TimeSheetDTO();
+        newtDTO.setEmployeeId(eDTO);
+        newtDTO.setDate(LocalDate.parse("2023-02-02"));
+        newtDTO.setNotes("test");
+        newtDTO.setHoliday(false);
+        newtDTO.setHoursWorked(Time.valueOf("8:00:00"));
     }
 
     @Test
@@ -108,27 +140,28 @@ class TimeSheetServiceTest {
     @Test
     void create() {
         when(timeSheetRepository.existsByDateAndEmployeeId(t.getDate(), t.getEmployeeId())).thenReturn(false);
-        when(employeeService.get(t.getEmployeeId().getId())).thenReturn(Optional.of(e));
-        TimeSheetModel rt = timeSheetService.create(t);
-        assertEquals(t, rt);
+        when(employeeService.get(t.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
+        TimeSheetDTO rt = timeSheetService.create(t);
+        assertThat(rt).usingRecursiveComparison().isEqualTo(tDTO);
         verify(timeSheetRepository, times(1)).save(t);
     }
 
     @Test
     void get(){
         when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.of(t));
-        Optional<TimeSheetModel> rt = timeSheetService.get(t.getId());
+        when(employeeService.get(t.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
+        Optional<TimeSheetDTO> rt = timeSheetService.get(t.getId());
         assertTrue(rt.isPresent());
-        assertEquals(t, rt.get());
+        assertThat(rt.get()).usingRecursiveComparison().isEqualTo(t);
     }
 
     @Test
     void put(){
         when(timeSheetRepository.findById(t.getId())).thenReturn(Optional.of(t));
         when(timeSheetRepository.existsByDateAndEmployeeIdAndIdNot(newt.getDate(), newt.getEmployeeId(), t.getId())).thenReturn(false);
-        when(employeeService.get(newt.getEmployeeId().getId())).thenReturn(Optional.of(e));
-        TimeSheetModel rt = timeSheetService.put(t.getId(), newt);
-        assertEquals(newt, rt);
+        when(employeeService.get(newt.getEmployeeId().getId())).thenReturn(Optional.of(eDTO));
+        TimeSheetDTO rt = timeSheetService.put(t.getId(), newt);
+        assertThat(rt).usingRecursiveComparison().isEqualTo(newtDTO);
         verify(timeSheetRepository, times(1)).save(newt);
     }
 
@@ -141,9 +174,9 @@ class TimeSheetServiceTest {
 
     @Test
     void searchByYearAndMonth(){
-        when(employeeService.get(e.getId())).thenReturn(Optional.of(e));
+        when(employeeService.get(e.getId())).thenReturn(Optional.of(eDTO));
         when(timeSheetRepository.findAllByYearAndMonth(2023, (byte) 2, e.getId())).thenReturn(List.of(t));
-        List<TimeSheetModel> rt = timeSheetService.searchByYearAndMonth(1L,2023, (byte) 2);
-        assertEquals(List.of(t), rt);
+        List<TimeSheetDTO> rt = timeSheetService.searchByYearAndMonth(1L,2023, (byte) 2);
+        assertThat(rt).usingRecursiveComparison().isEqualTo(List.of(t));
     }
 }

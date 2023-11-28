@@ -1,6 +1,7 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
 import ru.salarysage.models.PositionModel;
@@ -15,15 +16,19 @@ public class PositionService {
         this.positionRepository = positionRepository;
     }
 
-    public PositionModel create(PositionModel p) {
+    public PositionDTO create(PositionModel p) {
         boolean pByName = positionRepository.existsByName(p.getName());
         if (pByName) {
             throw new PositionException.PositionAlreadyExistsException();
         }
         positionRepository.save(p);
-        return p;
+        PositionDTO pDTO = new PositionDTO(
+                p.getName(),
+                p.getRate()
+        );
+        return pDTO;
     }
-    public Optional<PositionModel> get(long id) {
+    public Optional<PositionDTO> get(long id) {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -31,9 +36,13 @@ public class PositionService {
         if (p.isEmpty()){
             throw new PositionException.PositionNotFoundException();
         }
-        return p;
+        PositionDTO pDTO = new PositionDTO(
+                p.get().getName(),
+                p.get().getRate()
+        );
+        return Optional.of(pDTO);
     }
-    public PositionModel put(long id, PositionModel p) {
+    public PositionDTO put(long id, PositionModel p) {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -47,7 +56,11 @@ public class PositionService {
         }
         p.setId(id);
         positionRepository.save(p);
-        return p;
+        PositionDTO pDTO = new PositionDTO(
+                p.getName(),
+                p.getRate()
+        );
+        return pDTO;
     }
     public void delete(long id) {
         if (id <= 0) {

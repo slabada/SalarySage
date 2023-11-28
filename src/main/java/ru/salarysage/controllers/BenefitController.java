@@ -3,6 +3,7 @@ package ru.salarysage.controllers;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.salarysage.dto.BenefitDTO;
 import ru.salarysage.models.BenefitModel;
 import ru.salarysage.service.BenefitService;
 
@@ -20,19 +21,19 @@ public class BenefitController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public BenefitModel create(@RequestBody @Valid BenefitModel b){
+    public BenefitDTO create(@RequestBody @Valid BenefitModel b){
         return benefitService.create(b);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<BenefitModel> get(@PathVariable long id){
+    public Optional<BenefitDTO> get(@PathVariable long id){
         return benefitService.get(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public BenefitModel put(@PathVariable long id, @RequestBody @Valid BenefitModel b){
+    public BenefitDTO put(@PathVariable long id, @RequestBody @Valid BenefitModel b){
         return benefitService.put(id, b);
     }
 

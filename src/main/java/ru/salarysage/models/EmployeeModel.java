@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.salarysage.dto.PositionDTO;
 
 
 // Сущность сотрудника
@@ -47,4 +48,8 @@ public class EmployeeModel {
     @ManyToOne()
     @JoinColumn(name = "position_id")
     private PositionModel position;
+
+    public EmployeeModel(long id) {
+        this.id = id;
+    }
 }

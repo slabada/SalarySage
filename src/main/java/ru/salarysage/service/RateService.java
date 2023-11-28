@@ -1,6 +1,7 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.RateDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.RateException;
 import ru.salarysage.models.PaySheetModel;
@@ -19,15 +20,19 @@ public class RateService {
         this.rateRepository = rateRepository;
     }
 
-    public RateModel create(RateModel r){
+    public RateDTO create(RateModel r){
         boolean nBd = rateRepository.existsByName(r.getName());
         if(nBd){
             throw new RateException.RateAlreadyExistsException();
         }
         rateRepository.save(r);
-        return r;
+        RateDTO rDTO = new RateDTO(
+                r.getName(),
+                r.getPercent()
+        );
+        return rDTO;
     }
-    public Optional<RateModel> get(long id){
+    public Optional<RateDTO> get(long id){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -35,9 +40,13 @@ public class RateService {
         if(r.isEmpty()){
             throw new RateException.NullRateException();
         }
-        return r;
+        RateDTO rDTO = new RateDTO(
+                r.get().getName(),
+                r.get().getPercent()
+        );
+        return Optional.of(rDTO);
     }
-    public RateModel put(long id, RateModel r){
+    public RateDTO put(long id, RateModel r){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -51,7 +60,11 @@ public class RateService {
         }
         r.setId(id);
         rateRepository.save(r);
-        return r;
+        RateDTO rDTO = new RateDTO(
+                r.getName(),
+                r.getPercent()
+        );
+        return rDTO;
     }
     public void delete(long id){
         if(id <= 0){

@@ -3,6 +3,7 @@ package ru.salarysage.controllers;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.salarysage.dto.ProjectDTO;
 import ru.salarysage.models.ProjectModel;
 import ru.salarysage.service.DocumentsService;
 import ru.salarysage.service.ProjectService;
@@ -21,19 +22,19 @@ public class ProjectController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectModel create(@RequestBody @Valid ProjectModel p){
+    public ProjectDTO create(@RequestBody @Valid ProjectModel p){
         return projectService.create(p);
     }
 
-    @PostMapping("/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<ProjectModel> get(@PathVariable long id){
+    public Optional<ProjectDTO> get(@PathVariable long id){
         return projectService.get(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ProjectModel put(@PathVariable long id, @RequestBody @Valid ProjectModel p){
+    public ProjectDTO put(@PathVariable long id, @RequestBody @Valid ProjectModel p){
         return projectService.put(id, p);
     }
 

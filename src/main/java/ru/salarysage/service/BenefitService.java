@@ -1,6 +1,7 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.BenefitDTO;
 import ru.salarysage.exception.BenefitException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.models.BenefitModel;
@@ -19,15 +20,19 @@ public class BenefitService {
         this.benefitRepository = benefitRepository;
     }
 
-    public BenefitModel create(BenefitModel b){
+    public BenefitDTO create(BenefitModel b){
         boolean nDb = benefitRepository.existsByName(b.getName());
         if(nDb){
             throw new BenefitException.BenefitAlreadyExistsException();
         }
         benefitRepository.save(b);
-        return b;
+        BenefitDTO bDTO = new BenefitDTO(
+                b.getName(),
+                b.getAmount()
+        );
+        return bDTO;
     }
-    public Optional<BenefitModel> get(long id){
+    public Optional<BenefitDTO> get(long id){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -35,9 +40,13 @@ public class BenefitService {
         if(bDb.isEmpty()){
             throw new BenefitException.NullBenefitException();
         }
-        return bDb;
+        BenefitDTO bDTO = new BenefitDTO(
+                bDb.get().getName(),
+                bDb.get().getAmount()
+        );
+        return Optional.of(bDTO);
     }
-    public BenefitModel put (long id, BenefitModel b){
+    public BenefitDTO put (long id, BenefitModel b){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -51,7 +60,11 @@ public class BenefitService {
         }
         b.setId(id);
         benefitRepository.save(b);
-        return b;
+        BenefitDTO bDTO = new BenefitDTO(
+                b.getName(),
+                b.getAmount()
+        );
+        return bDTO;
     }
     public void delete(long id){
         if(id <= 0){

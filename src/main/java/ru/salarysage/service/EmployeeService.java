@@ -2,16 +2,15 @@ package ru.salarysage.service;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.EmployeeDTO;
+import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
 import ru.salarysage.models.*;
 import ru.salarysage.repository.EmployeeRepository;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class EmployeeService {
@@ -23,16 +22,28 @@ public class EmployeeService {
         this.positionService = positionService;
     }
 
-    public EmployeeModel create(EmployeeModel e){
-        Optional<PositionModel> p = positionService.get(e.getPosition().getId());
+    public EmployeeDTO create(EmployeeModel e){
+        Optional<PositionDTO> p = positionService.get(e.getPosition().getId());
         if(p.isEmpty()){
             throw new PositionException.PositionNotFoundException();
         }
-        e.setPosition(p.get());
+        e.setPosition(
+                new PositionModel(
+                        e.getPosition().getId(),
+                        p.get().getName(),
+                        p.get().getRate()
+                )
+        );
         employeeRepository.save(e);
-        return e;
+        EmployeeDTO eDTO = new EmployeeDTO(
+                e.getFirstName(),
+                e.getLastName(),
+                e.getAddress(),
+                p.get()
+        );
+        return eDTO;
     }
-    public Optional<EmployeeModel> get(long id){
+    public Optional<EmployeeDTO> get(long id){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -40,9 +51,19 @@ public class EmployeeService {
         if(e.isEmpty()) {
             throw new EmployeeException.EmployeeNotFoundException();
         }
-        return e;
+        Optional<PositionDTO> p = positionService.get(e.get().getPosition().getId());
+        if(p.isEmpty()){
+            throw new PositionException.PositionNotFoundException();
+        }
+        EmployeeDTO eDTO = new EmployeeDTO(
+                e.get().getFirstName(),
+                e.get().getLastName(),
+                e.get().getAddress(),
+                p.get()
+        );
+        return Optional.of(eDTO);
     }
-    public EmployeeModel put(long id, EmployeeModel e){
+    public EmployeeDTO put(long id, EmployeeModel e){
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
@@ -50,14 +71,26 @@ public class EmployeeService {
         if(eDb.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
-        Optional<PositionModel> pDb = positionService.get(e.getPosition().getId());
+        Optional<PositionDTO> pDb = positionService.get(e.getPosition().getId());
         if(pDb.isEmpty()){
             throw new PositionException.PositionNotFoundException();
         }
         e.setId(id);
-        e.setPosition(pDb.get());
+        e.setPosition(
+                new PositionModel(
+                        e.getPosition().getId(),
+                        pDb.get().getName(),
+                        pDb.get().getRate()
+                )
+        );
         employeeRepository.save(e);
-        return e;
+        EmployeeDTO eDTO = new EmployeeDTO(
+                e.getFirstName(),
+                e.getLastName(),
+                e.getAddress(),
+                pDb.get()
+        );
+        return eDTO;
     }
     public void delete(long id){
         if(id <= 0) {
@@ -69,7 +102,7 @@ public class EmployeeService {
         }
         employeeRepository.deleteById(id);
     }
-    public List<EmployeeModel> search(EmployeeModel e, int from, int size){
+    public List<EmployeeDTO> search(EmployeeModel e, int from, int size){
         if(from < 0 || size <= 0) {
             throw new EmployeeException.InvalidPageSizeException();
         }
@@ -80,11 +113,28 @@ public class EmployeeService {
     public Set<EmployeeModel> check(ProjectModel p) {
         Set<EmployeeModel> result = new HashSet<>();
         if (p.getEmployees() != null) {
-            List<Long> b = p.getEmployees().stream()
+            List<Long> employeeIds = p.getEmployees().stream()
                     .map(EmployeeModel::getId)
                     .toList();
-            List<EmployeeModel> bDb = employeeRepository.findAllById(b);
-            result.addAll(bDb);
+
+            List<EmployeeModel> eDb = employeeRepository.findAllById(employeeIds);
+
+//            // Перевод EmployeeModel в EmployeeDTO
+//            for (EmployeeModel employeeModel : eDb) {
+//                Optional<PositionDTO> pDTO = positionService.get(employeeModel.getPosition().getId());
+//                if(pDTO.isEmpty()){
+//                    throw new PositionException.PositionNotFoundException();
+//                }
+//                EmployeeDTO employeeDTO = new EmployeeDTO(
+//                        employeeModel.getFirstName(),
+//                        employeeModel.getLastName(),
+//                        employeeModel.getAddress(),
+//                        pDTO.get()
+//                );
+//                result.add(employeeDTO);
+//            }
+
+            result.addAll(eDb);
         }
         return result;
     }

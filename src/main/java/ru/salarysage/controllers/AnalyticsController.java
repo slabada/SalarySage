@@ -35,6 +35,7 @@ public class AnalyticsController {
     @GetMapping("{id}")
     public String getReport(@PathVariable long id, Model model){
         model.addAttribute("Project", projectController.get(id));
+        model.addAttribute("Project_id", id);
         model.addAttribute("Calculation", calculationAnalyticsUtil.calculationTotal(id));
         return "Analytics";
     }

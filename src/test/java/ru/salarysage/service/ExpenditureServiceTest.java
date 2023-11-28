@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.salarysage.dto.ExpenditureDTO;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.models.ExpenditureModel;
@@ -15,6 +16,7 @@ import ru.salarysage.repository.ExpenditureRepository;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -26,6 +28,7 @@ class ExpenditureServiceTest {
     @Mock
     private ExpenditureRepository expenditureRepository;
     private ExpenditureModel e;
+    private ExpenditureDTO eDTO;
     private ExpenditureModel newE;
     @BeforeEach
     void setUp() {
@@ -33,6 +36,10 @@ class ExpenditureServiceTest {
         e.setId(1L);
         e.setName("Test");
         e.setAmount(BigDecimal.valueOf(6666));
+
+        eDTO = new ExpenditureDTO();
+        eDTO.setName("Test");
+        eDTO.setAmount(BigDecimal.valueOf(6666));
 
         newE = new ExpenditureModel();
         newE.setId(1L);
@@ -71,26 +78,26 @@ class ExpenditureServiceTest {
     @Test
     void create() {
         when(expenditureRepository.existsByName(e.getName())).thenReturn(false);
-        ExpenditureModel r = expenditureService.create(e);
+        ExpenditureDTO r = expenditureService.create(e);
         verify(expenditureRepository, times(1)).save(e);
-        assertEquals(r, e);
+        assertThat(r).usingRecursiveComparison().isEqualTo(e);
     }
 
     @Test
     void get(){
         when(expenditureRepository.findById(e.getId())).thenReturn(Optional.ofNullable(e));
-        Optional<ExpenditureModel> r = expenditureService.get(e.getId());
+        Optional<ExpenditureDTO> r = expenditureService.get(e.getId());
         Assertions.assertTrue(r.isPresent());
-        assertEquals(e, r.get());
+        assertThat(r.get()).usingRecursiveComparison().isEqualTo(e);
     }
 
     @Test
     void put(){
         when(expenditureRepository.findById(e.getId())).thenReturn(Optional.ofNullable(e));
         when(expenditureRepository.existsByNameAndIdNot(newE.getName(),e.getId())).thenReturn(false);
-        ExpenditureModel r = expenditureService.put(e.getId(), newE);
+        ExpenditureDTO r = expenditureService.put(e.getId(), newE);
         verify(expenditureRepository, times(1)).save(newE);
-        assertEquals(newE, r);
+        assertThat(r).usingRecursiveComparison().isEqualTo(newE);
     }
 
     @Test

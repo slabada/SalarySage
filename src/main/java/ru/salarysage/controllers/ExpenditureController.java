@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import ru.salarysage.dto.ExpenditureDTO;
 import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.service.ExpenditureService;
 
@@ -21,19 +22,19 @@ public class ExpenditureController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ExpenditureModel create(@RequestBody @Valid ExpenditureModel e){
+    public ExpenditureDTO create(@RequestBody @Valid ExpenditureModel e){
         return expenditureService.create(e);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<ExpenditureModel> get(@PathVariable long id){
+    public Optional<ExpenditureDTO> get(@PathVariable long id){
         return expenditureService.get(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ExpenditureModel put(@PathVariable long id, @RequestBody @Valid ExpenditureModel e){
+    public ExpenditureDTO put(@PathVariable long id, @RequestBody @Valid ExpenditureModel e){
         return expenditureService.put(id,e);
     }
 

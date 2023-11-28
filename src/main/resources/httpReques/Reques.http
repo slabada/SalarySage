@@ -33,7 +33,7 @@ POST  http://localhost:8080/timesheet/create
 Content-Type: application/json
 
 {
-  "date": "2023-11-12",
+  "date": "2023-11-19",
   "hoursWorked": "08:00:00",
   "holiday": false,
   "medical": true,

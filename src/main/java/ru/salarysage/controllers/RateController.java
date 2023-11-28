@@ -3,6 +3,7 @@ package ru.salarysage.controllers;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.salarysage.dto.RateDTO;
 import ru.salarysage.models.RateModel;
 import ru.salarysage.service.RateService;
 
@@ -20,19 +21,19 @@ public class RateController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public RateModel create(@RequestBody @Valid RateModel r){
+    public RateDTO create(@RequestBody @Valid RateModel r){
         return rateService.create(r);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<RateModel> get(@PathVariable long id){
+    public Optional<RateDTO> get(@PathVariable long id){
         return rateService.get(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public RateModel put(@PathVariable long id, @RequestBody @Valid RateModel r){
+    public RateDTO put(@PathVariable long id, @RequestBody @Valid RateModel r){
         return rateService.put(id, r);
     }
 

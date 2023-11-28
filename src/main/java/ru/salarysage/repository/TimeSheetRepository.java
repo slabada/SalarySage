@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.models.EmployeeModel;
 import ru.salarysage.models.TimeSheetModel;
 
@@ -16,7 +17,7 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheetModel, Long>
 
     boolean existsByDateAndEmployeeId(LocalDate date, EmployeeModel employeeId);
 
-    List<TimeSheetModel> findAllByEmployeeId_Id(long id);
+    List<TimeSheetDTO> findAllByEmployeeId_Id(long id);
 
     @Query("""
             SELECT e FROM TimeSheetModel e
@@ -25,7 +26,7 @@ public interface TimeSheetRepository extends JpaRepository<TimeSheetModel, Long>
             AND e.employeeId.id = :employeeId
             """)
     List<TimeSheetModel> findAllByYearAndMonth(@Param("year") Integer year,
-                                               @Param("month") Byte month,
-                                               @Param("employeeId") long employeeId
+                                             @Param("month") Byte month,
+                                             @Param("employeeId") long employeeId
     );
 }
