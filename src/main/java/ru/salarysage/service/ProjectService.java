@@ -9,6 +9,7 @@ import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.ProjectException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.EmployeeModel;
 import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.models.ProjectModel;
@@ -24,12 +25,15 @@ public class ProjectService {
     protected final ProjectRepository projectRepository;
     protected final EmployeeService employeeService;
     protected final ExpenditureService expenditureService;
+    protected final GenericMapper genericMapper;
     public ProjectService(ProjectRepository projectRepository,
                           EmployeeService employeeService,
-                          ExpenditureService expenditureService) {
+                          ExpenditureService expenditureService,
+                          GenericMapper genericMapper) {
         this.projectRepository = projectRepository;
         this.employeeService = employeeService;
         this.expenditureService = expenditureService;
+        this.genericMapper = genericMapper;
     }
 
     public ProjectDTO create(ProjectModel p){
@@ -50,35 +54,8 @@ public class ProjectService {
         if(p.getStartDate() == null){
             p.setStartDate(LocalDate.now());
         }
-        projectRepository.save(p);
-
-        Set<EmployeeDTO> eDTO = emDb.stream()
-                .map(employeeModel -> new EmployeeDTO(
-                        employeeModel.getLastName(),
-                        employeeModel.getFirstName(),
-                        employeeModel.getAddress(),
-                        new PositionDTO(
-                                employeeModel.getPosition().getName(),
-                                employeeModel.getPosition().getRate()
-                        )
-                ))
-                .collect(Collectors.toSet());
-
-        Set<ExpenditureDTO> xDTO = exDb.stream()
-                .map(expenditureModel -> new ExpenditureDTO(
-                        expenditureModel.getName(),
-                        expenditureModel.getAmount()
-                ))
-                .collect(Collectors.toSet());
-
-        ProjectDTO pDTO = new ProjectDTO(
-                p.getName(),
-                p.getStartDate(),
-                p.getEndDate(),
-                eDTO,
-                xDTO
-        );
-
+        ProjectModel save = projectRepository.save(p);
+        ProjectDTO pDTO = genericMapper.convertToDto(save, ProjectDTO.class);
         return pDTO;
     }
     public Optional<ProjectDTO> get(long id){
@@ -97,32 +74,7 @@ public class ProjectService {
         if(exDb.isEmpty()){
             throw new ExpenditureException.NoExpenditure();
         }
-        Set<EmployeeDTO> eDTO = emDb.stream()
-                .map(employeeModel -> new EmployeeDTO(
-                        employeeModel.getLastName(),
-                        employeeModel.getFirstName(),
-                        employeeModel.getAddress(),
-                        new PositionDTO(
-                                employeeModel.getPosition().getName(),
-                                employeeModel.getPosition().getRate()
-                        )
-                ))
-                .collect(Collectors.toSet());
-
-        Set<ExpenditureDTO> xDTO = exDb.stream()
-                .map(expenditureModel -> new ExpenditureDTO(
-                        expenditureModel.getName(),
-                        expenditureModel.getAmount()
-                ))
-                .collect(Collectors.toSet());
-
-        ProjectDTO pDTO = new ProjectDTO(
-                p.get().getName(),
-                p.get().getStartDate(),
-                p.get().getEndDate(),
-                eDTO,
-                xDTO
-        );
+        ProjectDTO pDTO = genericMapper.convertToDto(p, ProjectDTO.class);
         return Optional.of(pDTO);
     }
     public ProjectDTO put(long id, ProjectModel p){
@@ -148,33 +100,8 @@ public class ProjectService {
             throw new ExpenditureException.NoExpenditure();
         }
         p.setId(id);
-        projectRepository.save(p);
-        Set<EmployeeDTO> eDTO = emDb.stream()
-                .map(employeeModel -> new EmployeeDTO(
-                        employeeModel.getLastName(),
-                        employeeModel.getFirstName(),
-                        employeeModel.getAddress(),
-                        new PositionDTO(
-                                employeeModel.getPosition().getName(),
-                                employeeModel.getPosition().getRate()
-                        )
-                ))
-                .collect(Collectors.toSet());
-
-        Set<ExpenditureDTO> xDTO = exDb.stream()
-                .map(expenditureModel -> new ExpenditureDTO(
-                        expenditureModel.getName(),
-                        expenditureModel.getAmount()
-                ))
-                .collect(Collectors.toSet());
-
-        ProjectDTO pDTO = new ProjectDTO(
-                p.getName(),
-                p.getStartDate(),
-                p.getEndDate(),
-                eDTO,
-                xDTO
-        );
+        ProjectModel save = projectRepository.save(p);
+        ProjectDTO pDTO = genericMapper.convertToDto(save, ProjectDTO.class);
         return pDTO;
     }
     public void delete(long id){

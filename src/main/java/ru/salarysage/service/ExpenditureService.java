@@ -1,13 +1,10 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
-import ru.salarysage.dto.EmployeeDTO;
 import ru.salarysage.dto.ExpenditureDTO;
-import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
-import ru.salarysage.exception.PositionException;
-import ru.salarysage.models.EmployeeModel;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.ExpenditureModel;
 import ru.salarysage.models.ProjectModel;
 import ru.salarysage.repository.ExpenditureRepository;
@@ -20,8 +17,11 @@ import java.util.Set;
 @Service
 public class ExpenditureService {
     protected final ExpenditureRepository expenditureRepository;
-    public ExpenditureService(ExpenditureRepository expenditureRepository) {
+    protected final GenericMapper genericMapper;
+    public ExpenditureService(ExpenditureRepository expenditureRepository,
+                              GenericMapper genericMapper) {
         this.expenditureRepository = expenditureRepository;
+        this.genericMapper = genericMapper;
     }
 
     public ExpenditureDTO create(ExpenditureModel e){
@@ -29,11 +29,8 @@ public class ExpenditureService {
         if(eDb){
             throw new ExpenditureException.ConflictName();
         }
-        expenditureRepository.save(e);
-        ExpenditureDTO eDTO = new ExpenditureDTO(
-                e.getName(),
-                e.getAmount()
-        );
+        ExpenditureModel save = expenditureRepository.save(e);
+        ExpenditureDTO eDTO = genericMapper.convertToDto(save, ExpenditureDTO.class);
         return eDTO;
     }
     public Optional<ExpenditureDTO> get(long id){
@@ -44,10 +41,7 @@ public class ExpenditureService {
         if(eDb.isEmpty()){
             throw new ExpenditureException.NoExpenditure();
         }
-        ExpenditureDTO eDTO = new ExpenditureDTO(
-                eDb.get().getName(),
-                eDb.get().getAmount()
-        );
+        ExpenditureDTO eDTO = genericMapper.convertToDto(eDb, ExpenditureDTO.class);
         return Optional.of(eDTO);
     }
     public ExpenditureDTO put(long id, ExpenditureModel e){
@@ -63,11 +57,8 @@ public class ExpenditureService {
             throw new ExpenditureException.ConflictName();
         }
         e.setId(id);
-        expenditureRepository.save(e);
-        ExpenditureDTO eDTO = new ExpenditureDTO(
-                e.getName(),
-                e.getAmount()
-        );
+        ExpenditureModel save = expenditureRepository.save(e);
+        ExpenditureDTO eDTO = genericMapper.convertToDto(save, ExpenditureDTO.class);
         return eDTO;
     }
     public void delete(long id){

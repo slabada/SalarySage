@@ -190,7 +190,7 @@ class PaySheetServiceTest {
         when(rateService.check(ps)).thenReturn(Collections.singleton(r));
         when(calculationUtil.calculationTotal(
                 List.of(tDTO),
-                psDTO.getEmployeeId().getPosition(),
+                ps.getEmployeeId().getPosition(),
                 ps
         )).thenReturn(psDTO.getTotalAmount());
         PaySheetDTO rps = paySheetService.create(ps);
@@ -219,7 +219,7 @@ class PaySheetServiceTest {
         when(rateService.check(newps)).thenReturn(Collections.singleton(r));
         when(calculationUtil.calculationTotal(
                 List.of(tDTO),
-                newpsDTO.getEmployeeId().getPosition(),
+                newps.getEmployeeId().getPosition(),
                 newps
         )).thenReturn(newpsDTO.getTotalAmount());
         PaySheetDTO rps = paySheetService.put(ps.getId(), newps);

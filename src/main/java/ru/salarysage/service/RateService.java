@@ -1,9 +1,11 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
+import ru.salarysage.dto.BenefitDTO;
 import ru.salarysage.dto.RateDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.RateException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.PaySheetModel;
 import ru.salarysage.models.RateModel;
 import ru.salarysage.repository.RateRepository;
@@ -16,8 +18,11 @@ import java.util.Set;
 @Service
 public class RateService {
     protected final RateRepository rateRepository;
-    public RateService(RateRepository rateRepository) {
+    protected final GenericMapper genericMapper;
+    public RateService(RateRepository rateRepository,
+                       GenericMapper genericMapper) {
         this.rateRepository = rateRepository;
+        this.genericMapper = genericMapper;
     }
 
     public RateDTO create(RateModel r){
@@ -25,11 +30,8 @@ public class RateService {
         if(nBd){
             throw new RateException.RateAlreadyExistsException();
         }
-        rateRepository.save(r);
-        RateDTO rDTO = new RateDTO(
-                r.getName(),
-                r.getPercent()
-        );
+        RateModel save = rateRepository.save(r);
+        RateDTO rDTO = genericMapper.convertToDto(save, RateDTO.class);
         return rDTO;
     }
     public Optional<RateDTO> get(long id){
@@ -40,10 +42,7 @@ public class RateService {
         if(r.isEmpty()){
             throw new RateException.NullRateException();
         }
-        RateDTO rDTO = new RateDTO(
-                r.get().getName(),
-                r.get().getPercent()
-        );
+        RateDTO rDTO = genericMapper.convertToDto(r, RateDTO.class);
         return Optional.of(rDTO);
     }
     public RateDTO put(long id, RateModel r){
@@ -59,11 +58,8 @@ public class RateService {
             throw new RateException.RateAlreadyExistsException();
         }
         r.setId(id);
-        rateRepository.save(r);
-        RateDTO rDTO = new RateDTO(
-                r.getName(),
-                r.getPercent()
-        );
+        RateModel save = rateRepository.save(r);
+        RateDTO rDTO = genericMapper.convertToDto(save, RateDTO.class);
         return rDTO;
     }
     public void delete(long id){

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.PositionModel;
 import ru.salarysage.repository.PositionRepository;
 
@@ -12,8 +13,11 @@ import java.util.Optional;
 @Service
 public class PositionService {
     protected final PositionRepository positionRepository;
-    public PositionService(PositionRepository positionRepository) {
+    protected final GenericMapper genericMapper;
+    public PositionService(PositionRepository positionRepository,
+                           GenericMapper genericMapper) {
         this.positionRepository = positionRepository;
+        this.genericMapper = genericMapper;
     }
 
     public PositionDTO create(PositionModel p) {
@@ -21,11 +25,8 @@ public class PositionService {
         if (pByName) {
             throw new PositionException.PositionAlreadyExistsException();
         }
-        positionRepository.save(p);
-        PositionDTO pDTO = new PositionDTO(
-                p.getName(),
-                p.getRate()
-        );
+        PositionModel save = positionRepository.save(p);
+        PositionDTO pDTO = genericMapper.convertToDto(save,PositionDTO.class);
         return pDTO;
     }
     public Optional<PositionDTO> get(long id) {
@@ -36,10 +37,7 @@ public class PositionService {
         if (p.isEmpty()){
             throw new PositionException.PositionNotFoundException();
         }
-        PositionDTO pDTO = new PositionDTO(
-                p.get().getName(),
-                p.get().getRate()
-        );
+        PositionDTO pDTO = genericMapper.convertToDto(p,PositionDTO.class);
         return Optional.of(pDTO);
     }
     public PositionDTO put(long id, PositionModel p) {
@@ -55,11 +53,8 @@ public class PositionService {
             throw new PositionException.PositionAlreadyExistsException();
         }
         p.setId(id);
-        positionRepository.save(p);
-        PositionDTO pDTO = new PositionDTO(
-                p.getName(),
-                p.getRate()
-        );
+        PositionModel save = positionRepository.save(p);
+        PositionDTO pDTO = genericMapper.convertToDto(save,PositionDTO.class);
         return pDTO;
     }
     public void delete(long id) {

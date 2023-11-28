@@ -1,7 +1,6 @@
 package ru.salarysage.util;
 
 import org.springframework.stereotype.Component;
-import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.models.*;
 
@@ -26,7 +25,7 @@ public class CalculationUtil {
     // Среднее количество дней
     private static final float AVERAGE_WORKING_DAYS = 29.3f;
     // Метод для расчета общей суммы
-    public BigDecimal calculationTotal(List<TimeSheetDTO> timeSheetList, PositionDTO position, PaySheetModel paySheet) {
+    public BigDecimal calculationTotal(List<TimeSheetDTO> timeSheetList, PositionModel position, PaySheetModel paySheet) {
         // Получение первого дня месяца
         LocalDate firstDayOfMonth = getFirstDayOfMonth(timeSheetList);
         // Получение последнего дня месяца

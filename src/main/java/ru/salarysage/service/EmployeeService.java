@@ -7,40 +7,34 @@ import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.*;
 import ru.salarysage.repository.EmployeeRepository;
+import ru.salarysage.repository.PositionRepository;
 
 import java.util.*;
 
 @Service
 public class EmployeeService {
     protected final EmployeeRepository employeeRepository;
-    protected final PositionService positionService;
+    protected final PositionRepository positionRepository;
+    protected final GenericMapper genericMapper;
     public EmployeeService(EmployeeRepository employeeRepository,
-                           PositionService positionService) {
+                           PositionRepository positionRepository,
+                           GenericMapper genericMapper) {
         this.employeeRepository = employeeRepository;
-        this.positionService = positionService;
+        this.positionRepository = positionRepository;
+        this.genericMapper = genericMapper;
     }
 
     public EmployeeDTO create(EmployeeModel e){
-        Optional<PositionDTO> p = positionService.get(e.getPosition().getId());
+        Optional<PositionModel> p = positionRepository.findById(e.getPosition().getId());
         if(p.isEmpty()){
             throw new PositionException.PositionNotFoundException();
         }
-        e.setPosition(
-                new PositionModel(
-                        e.getPosition().getId(),
-                        p.get().getName(),
-                        p.get().getRate()
-                )
-        );
-        employeeRepository.save(e);
-        EmployeeDTO eDTO = new EmployeeDTO(
-                e.getFirstName(),
-                e.getLastName(),
-                e.getAddress(),
-                p.get()
-        );
+        e.setPosition(p.get());
+        EmployeeModel save = employeeRepository.save(e);
+        EmployeeDTO eDTO = genericMapper.convertToDto(save, EmployeeDTO.class);
         return eDTO;
     }
     public Optional<EmployeeDTO> get(long id){
@@ -51,16 +45,11 @@ public class EmployeeService {
         if(e.isEmpty()) {
             throw new EmployeeException.EmployeeNotFoundException();
         }
-        Optional<PositionDTO> p = positionService.get(e.get().getPosition().getId());
+        Optional<PositionModel> p = positionRepository.findById(e.get().getPosition().getId());
         if(p.isEmpty()){
             throw new PositionException.PositionNotFoundException();
         }
-        EmployeeDTO eDTO = new EmployeeDTO(
-                e.get().getFirstName(),
-                e.get().getLastName(),
-                e.get().getAddress(),
-                p.get()
-        );
+        EmployeeDTO eDTO = genericMapper.convertToDto(e, EmployeeDTO.class);
         return Optional.of(eDTO);
     }
     public EmployeeDTO put(long id, EmployeeModel e){
@@ -71,25 +60,14 @@ public class EmployeeService {
         if(eDb.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
-        Optional<PositionDTO> pDb = positionService.get(e.getPosition().getId());
+        Optional<PositionModel> pDb = positionRepository.findById(e.getPosition().getId());
         if(pDb.isEmpty()){
             throw new PositionException.PositionNotFoundException();
         }
         e.setId(id);
-        e.setPosition(
-                new PositionModel(
-                        e.getPosition().getId(),
-                        pDb.get().getName(),
-                        pDb.get().getRate()
-                )
-        );
-        employeeRepository.save(e);
-        EmployeeDTO eDTO = new EmployeeDTO(
-                e.getFirstName(),
-                e.getLastName(),
-                e.getAddress(),
-                pDb.get()
-        );
+        e.setPosition(pDb.get());
+        EmployeeModel save = employeeRepository.save(e);
+        EmployeeDTO eDTO = genericMapper.convertToDto(save, EmployeeDTO.class);
         return eDTO;
     }
     public void delete(long id){
@@ -116,24 +94,7 @@ public class EmployeeService {
             List<Long> employeeIds = p.getEmployees().stream()
                     .map(EmployeeModel::getId)
                     .toList();
-
             List<EmployeeModel> eDb = employeeRepository.findAllById(employeeIds);
-
-//            // Перевод EmployeeModel в EmployeeDTO
-//            for (EmployeeModel employeeModel : eDb) {
-//                Optional<PositionDTO> pDTO = positionService.get(employeeModel.getPosition().getId());
-//                if(pDTO.isEmpty()){
-//                    throw new PositionException.PositionNotFoundException();
-//                }
-//                EmployeeDTO employeeDTO = new EmployeeDTO(
-//                        employeeModel.getFirstName(),
-//                        employeeModel.getLastName(),
-//                        employeeModel.getAddress(),
-//                        pDTO.get()
-//                );
-//                result.add(employeeDTO);
-//            }
-
             result.addAll(eDb);
         }
         return result;

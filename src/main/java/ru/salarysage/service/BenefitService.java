@@ -2,8 +2,10 @@ package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.BenefitDTO;
+import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.exception.BenefitException;
 import ru.salarysage.exception.GeneraleException;
+import ru.salarysage.mapper.GenericMapper;
 import ru.salarysage.models.BenefitModel;
 import ru.salarysage.models.PaySheetModel;
 import ru.salarysage.repository.BenefitRepository;
@@ -16,8 +18,11 @@ import java.util.Set;
 @Service
 public class BenefitService {
     protected final BenefitRepository benefitRepository;
-    public BenefitService(BenefitRepository benefitRepository) {
+    protected final GenericMapper genericMapper;
+    public BenefitService(BenefitRepository benefitRepository,
+                          GenericMapper genericMapper) {
         this.benefitRepository = benefitRepository;
+        this.genericMapper = genericMapper;
     }
 
     public BenefitDTO create(BenefitModel b){
@@ -25,11 +30,8 @@ public class BenefitService {
         if(nDb){
             throw new BenefitException.BenefitAlreadyExistsException();
         }
-        benefitRepository.save(b);
-        BenefitDTO bDTO = new BenefitDTO(
-                b.getName(),
-                b.getAmount()
-        );
+        BenefitModel save = benefitRepository.save(b);
+        BenefitDTO bDTO = genericMapper.convertToDto(save, BenefitDTO.class);
         return bDTO;
     }
     public Optional<BenefitDTO> get(long id){
@@ -40,10 +42,7 @@ public class BenefitService {
         if(bDb.isEmpty()){
             throw new BenefitException.NullBenefitException();
         }
-        BenefitDTO bDTO = new BenefitDTO(
-                bDb.get().getName(),
-                bDb.get().getAmount()
-        );
+        BenefitDTO bDTO = genericMapper.convertToDto(bDb, BenefitDTO.class);
         return Optional.of(bDTO);
     }
     public BenefitDTO put (long id, BenefitModel b){
@@ -59,11 +58,8 @@ public class BenefitService {
             throw new BenefitException.BenefitAlreadyExistsException();
         }
         b.setId(id);
-        benefitRepository.save(b);
-        BenefitDTO bDTO = new BenefitDTO(
-                b.getName(),
-                b.getAmount()
-        );
+        BenefitModel save = benefitRepository.save(b);
+        BenefitDTO bDTO = genericMapper.convertToDto(save, BenefitDTO.class);
         return bDTO;
     }
     public void delete(long id){
