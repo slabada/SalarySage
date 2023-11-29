@@ -40,8 +40,7 @@ public class TimeSheetService {
         }
         t.setEmployeeId(e.get());
         TimeSheetModel save = timeSheetRepository.save(t);
-        TimeSheetDTO tDTO = genericMapper.convertToDto(save, TimeSheetDTO.class);
-        return tDTO;
+        return genericMapper.convertToDto(save, TimeSheetDTO.class);
     }
     public Optional<TimeSheetDTO> get(long id){
         if(id <= 0){
@@ -77,8 +76,7 @@ public class TimeSheetService {
         t.setId(id);
         t.setEmployeeId(e.get());
         TimeSheetModel save = timeSheetRepository.save(t);
-        TimeSheetDTO tDTO = genericMapper.convertToDto(save, TimeSheetDTO.class);
-        return tDTO;
+        return genericMapper.convertToDto(save, TimeSheetDTO.class);
     }
     public void delete(long id){
         if(id <= 0){
@@ -109,10 +107,9 @@ public class TimeSheetService {
         if(t.isEmpty()) {
             throw new TimeSheetException.NullTimeSheetException();
         }
-        List<TimeSheetDTO> tDTO = t.stream()
+        return t.stream()
                 .map(timeSheetModel -> genericMapper.convertToDto(timeSheetModel, TimeSheetDTO.class)
                 ).toList();
-        return tDTO;
     }
     public List<TimeSheetDTO> getAll(long id){
         if(id <= 0){

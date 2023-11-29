@@ -2,7 +2,6 @@ package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.BenefitDTO;
-import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.exception.BenefitException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.mapper.GenericMapper;
@@ -31,8 +30,7 @@ public class BenefitService {
             throw new BenefitException.BenefitAlreadyExistsException();
         }
         BenefitModel save = benefitRepository.save(b);
-        BenefitDTO bDTO = genericMapper.convertToDto(save, BenefitDTO.class);
-        return bDTO;
+        return genericMapper.convertToDto(save, BenefitDTO.class);
     }
     public Optional<BenefitDTO> get(long id){
         if(id <= 0){
@@ -59,8 +57,7 @@ public class BenefitService {
         }
         b.setId(id);
         BenefitModel save = benefitRepository.save(b);
-        BenefitDTO bDTO = genericMapper.convertToDto(save, BenefitDTO.class);
-        return bDTO;
+        return genericMapper.convertToDto(save, BenefitDTO.class);
     }
     public void delete(long id){
         if(id <= 0){

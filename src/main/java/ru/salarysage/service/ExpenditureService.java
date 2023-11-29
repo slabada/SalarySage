@@ -30,8 +30,7 @@ public class ExpenditureService {
             throw new ExpenditureException.ConflictName();
         }
         ExpenditureModel save = expenditureRepository.save(e);
-        ExpenditureDTO eDTO = genericMapper.convertToDto(save, ExpenditureDTO.class);
-        return eDTO;
+        return genericMapper.convertToDto(save, ExpenditureDTO.class);
     }
     public Optional<ExpenditureDTO> get(long id){
         if(id <= 0) {
@@ -58,8 +57,7 @@ public class ExpenditureService {
         }
         e.setId(id);
         ExpenditureModel save = expenditureRepository.save(e);
-        ExpenditureDTO eDTO = genericMapper.convertToDto(save, ExpenditureDTO.class);
-        return eDTO;
+        return genericMapper.convertToDto(save, ExpenditureDTO.class);
     }
     public void delete(long id){
         if(id <= 0){

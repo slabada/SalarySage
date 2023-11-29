@@ -76,8 +76,7 @@ public class PaySheetService {
         );
         ps.setTotalAmount(total);
         PaySheetModel save = paySheetRepository.save(ps);
-        PaySheetDTO psDTO = genericMapper.convertToDto(save, PaySheetDTO.class);
-        return psDTO;
+        return genericMapper.convertToDto(save, PaySheetDTO.class);
     }
     public Optional<PaySheetDTO> get(long id){
         if(id <= 0){
@@ -127,8 +126,7 @@ public class PaySheetService {
         ps.setId(id);
         ps.setTotalAmount(total);
         PaySheetModel save = paySheetRepository.save(ps);
-        PaySheetDTO psDTO = genericMapper.convertToDto(save, PaySheetDTO.class);
-        return psDTO;
+        return genericMapper.convertToDto(save, PaySheetDTO.class);
     }
     public void delete(long id){
         if(id <= 0){
@@ -149,11 +147,10 @@ public class PaySheetService {
         if(ps.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
-        List<PaySheetDTO> psDTO = ps.stream()
+        return ps.stream()
                 .map(timeSheetModel -> genericMapper.convertToDto(
                         timeSheetModel,
                         PaySheetDTO.class)
                 ).toList();
-        return psDTO;
     }
 }

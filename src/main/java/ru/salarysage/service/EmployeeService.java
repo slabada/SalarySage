@@ -3,16 +3,20 @@ package ru.salarysage.service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.EmployeeDTO;
-import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.PositionException;
 import ru.salarysage.mapper.GenericMapper;
-import ru.salarysage.models.*;
+import ru.salarysage.models.EmployeeModel;
+import ru.salarysage.models.PositionModel;
+import ru.salarysage.models.ProjectModel;
 import ru.salarysage.repository.EmployeeRepository;
 import ru.salarysage.repository.PositionRepository;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class EmployeeService {
@@ -34,8 +38,7 @@ public class EmployeeService {
         }
         e.setPosition(p.get());
         EmployeeModel save = employeeRepository.save(e);
-        EmployeeDTO eDTO = genericMapper.convertToDto(save, EmployeeDTO.class);
-        return eDTO;
+        return genericMapper.convertToDto(save, EmployeeDTO.class);
     }
     public Optional<EmployeeDTO> get(long id){
         if(id <= 0){
@@ -67,8 +70,7 @@ public class EmployeeService {
         e.setId(id);
         e.setPosition(pDb.get());
         EmployeeModel save = employeeRepository.save(e);
-        EmployeeDTO eDTO = genericMapper.convertToDto(save, EmployeeDTO.class);
-        return eDTO;
+        return genericMapper.convertToDto(save, EmployeeDTO.class);
     }
     public void delete(long id){
         if(id <= 0) {

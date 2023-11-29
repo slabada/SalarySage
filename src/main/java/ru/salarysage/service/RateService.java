@@ -1,7 +1,6 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
-import ru.salarysage.dto.BenefitDTO;
 import ru.salarysage.dto.RateDTO;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.exception.RateException;
@@ -31,8 +30,7 @@ public class RateService {
             throw new RateException.RateAlreadyExistsException();
         }
         RateModel save = rateRepository.save(r);
-        RateDTO rDTO = genericMapper.convertToDto(save, RateDTO.class);
-        return rDTO;
+        return genericMapper.convertToDto(save, RateDTO.class);
     }
     public Optional<RateDTO> get(long id){
         if(id <= 0){
@@ -59,8 +57,7 @@ public class RateService {
         }
         r.setId(id);
         RateModel save = rateRepository.save(r);
-        RateDTO rDTO = genericMapper.convertToDto(save, RateDTO.class);
-        return rDTO;
+        return genericMapper.convertToDto(save, RateDTO.class);
     }
     public void delete(long id){
         if(id <= 0){

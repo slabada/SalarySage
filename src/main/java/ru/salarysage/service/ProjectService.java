@@ -1,9 +1,6 @@
 package ru.salarysage.service;
 
 import org.springframework.stereotype.Service;
-import ru.salarysage.dto.EmployeeDTO;
-import ru.salarysage.dto.ExpenditureDTO;
-import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.dto.ProjectDTO;
 import ru.salarysage.exception.EmployeeException;
 import ru.salarysage.exception.ExpenditureException;
@@ -18,7 +15,6 @@ import ru.salarysage.repository.ProjectRepository;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -52,8 +48,7 @@ public class ProjectService {
             p.setStartDate(LocalDate.now());
         }
         ProjectModel save = projectRepository.save(p);
-        ProjectDTO pDTO = genericMapper.convertToDto(save, ProjectDTO.class);
-        return pDTO;
+        return genericMapper.convertToDto(save, ProjectDTO.class);
     }
     public Optional<ProjectDTO> get(long id){
         if(id <= 0){
@@ -95,8 +90,7 @@ public class ProjectService {
         p.setExpenditure(exDb);
         p.setId(id);
         ProjectModel save = projectRepository.save(p);
-        ProjectDTO pDTO = genericMapper.convertToDto(save, ProjectDTO.class);
-        return pDTO;
+        return genericMapper.convertToDto(save, ProjectDTO.class);
     }
     public void delete(long id){
         if(id <= 0){

@@ -26,8 +26,7 @@ public class PositionService {
             throw new PositionException.PositionAlreadyExistsException();
         }
         PositionModel save = positionRepository.save(p);
-        PositionDTO pDTO = genericMapper.convertToDto(save,PositionDTO.class);
-        return pDTO;
+        return genericMapper.convertToDto(save,PositionDTO.class);
     }
     public Optional<PositionDTO> get(long id) {
         if (id <= 0){
@@ -54,8 +53,7 @@ public class PositionService {
         }
         p.setId(id);
         PositionModel save = positionRepository.save(p);
-        PositionDTO pDTO = genericMapper.convertToDto(save,PositionDTO.class);
-        return pDTO;
+        return genericMapper.convertToDto(save,PositionDTO.class);
     }
     public void delete(long id) {
         if (id <= 0) {
