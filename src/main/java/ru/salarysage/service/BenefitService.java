@@ -1,5 +1,6 @@
 package ru.salarysage.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.BenefitDTO;
 import ru.salarysage.exception.BenefitException;
@@ -15,14 +16,11 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class BenefitService {
+
     protected final BenefitRepository benefitRepository;
     protected final GenericMapper genericMapper;
-    public BenefitService(BenefitRepository benefitRepository,
-                          GenericMapper genericMapper) {
-        this.benefitRepository = benefitRepository;
-        this.genericMapper = genericMapper;
-    }
 
     public BenefitDTO create(BenefitModel b){
         boolean nDb = benefitRepository.existsByName(b.getName());

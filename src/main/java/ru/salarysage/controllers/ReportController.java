@@ -1,6 +1,7 @@
 package ru.salarysage.controllers;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,22 +15,13 @@ import java.io.IOException;
 
 @Controller
 @RequestMapping("/report")
+@RequiredArgsConstructor
 public class ReportController {
 
     protected final PaySheetController paySheetController;
     protected final EmployeeController employeeController;
     protected final TimeSheetController timeSheetController;
     protected final DocumentsService documentsService;
-
-    public ReportController(PaySheetController paySheetController,
-                            EmployeeController employeeController,
-                            TimeSheetController timeSheetController,
-                            DocumentsService documentsService) {
-        this.paySheetController = paySheetController;
-        this.employeeController = employeeController;
-        this.timeSheetController = timeSheetController;
-        this.documentsService = documentsService;
-    }
 
     @GetMapping("/paysheet/{id}")
     public String getPaySheet(@PathVariable long id, Model model){

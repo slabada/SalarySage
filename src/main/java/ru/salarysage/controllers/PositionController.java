@@ -1,6 +1,7 @@
 package ru.salarysage.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.salarysage.dto.PositionDTO;
@@ -11,13 +12,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/position")
+@RequiredArgsConstructor
 public class PositionController {
 
     protected final PositionService positionService;
-
-    public PositionController(PositionService positionService) {
-        this.positionService = positionService;
-    }
 
     // Обработчик HTTP POST запроса для создания новой должности
     @PostMapping("/create")

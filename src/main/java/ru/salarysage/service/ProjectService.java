@@ -1,5 +1,6 @@
 package ru.salarysage.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.ProjectDTO;
 import ru.salarysage.exception.EmployeeException;
@@ -17,20 +18,13 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectService {
+
     protected final ProjectRepository projectRepository;
     protected final EmployeeService employeeService;
     protected final ExpenditureService expenditureService;
     protected final GenericMapper genericMapper;
-    public ProjectService(ProjectRepository projectRepository,
-                          EmployeeService employeeService,
-                          ExpenditureService expenditureService,
-                          GenericMapper genericMapper) {
-        this.projectRepository = projectRepository;
-        this.employeeService = employeeService;
-        this.expenditureService = expenditureService;
-        this.genericMapper = genericMapper;
-    }
 
     public ProjectDTO create(ProjectModel p){
         boolean pDb = projectRepository.existsByName(p.getName());

@@ -1,5 +1,6 @@
 package ru.salarysage.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.PositionDTO;
 import ru.salarysage.exception.GeneraleException;
@@ -11,14 +12,10 @@ import ru.salarysage.repository.PositionRepository;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PositionService {
     protected final PositionRepository positionRepository;
     protected final GenericMapper genericMapper;
-    public PositionService(PositionRepository positionRepository,
-                           GenericMapper genericMapper) {
-        this.positionRepository = positionRepository;
-        this.genericMapper = genericMapper;
-    }
 
     public PositionDTO create(PositionModel p) {
         boolean pByName = positionRepository.existsByName(p.getName());

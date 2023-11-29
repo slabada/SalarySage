@@ -1,5 +1,6 @@
 package ru.salarysage.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.RateDTO;
 import ru.salarysage.exception.GeneraleException;
@@ -15,14 +16,11 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class RateService {
+
     protected final RateRepository rateRepository;
     protected final GenericMapper genericMapper;
-    public RateService(RateRepository rateRepository,
-                       GenericMapper genericMapper) {
-        this.rateRepository = rateRepository;
-        this.genericMapper = genericMapper;
-    }
 
     public RateDTO create(RateModel r){
         boolean nBd = rateRepository.existsByName(r.getName());

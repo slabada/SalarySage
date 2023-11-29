@@ -1,6 +1,7 @@
 package ru.salarysage.service;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -20,29 +21,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentsService {
+
     protected final ProjectService projectService;
     protected final CalculationAnalyticsUtil calculationAnalyticsUtil;
     protected final TimeSheetService timeSheetService;
     protected final EmployeeService employeeService;
     protected final PaySheetService paySheetService;
+
     // Тип контента и заголовки для Word документа
     private static final String CONTENT_TYPE = "application/word";
     private static final String CONTENT_DISPOSITION = "attachment; filename=document.doc";
     // Тип контента и заголовки для Excel документа
     private static final String EXCEL_CONTENT_TYPE = "application/exel";
     private static final String EXCEL_CONTENT_DISPOSITION = "attachment; filename=document.xlsx";
-    public DocumentsService(ProjectService projectService,
-                            CalculationAnalyticsUtil calculationAnalyticsUtil,
-                            TimeSheetService timeSheetService,
-                            EmployeeService employeeService,
-                            PaySheetService paySheetService) {
-        this.projectService = projectService;
-        this.calculationAnalyticsUtil = calculationAnalyticsUtil;
-        this.timeSheetService = timeSheetService;
-        this.employeeService = employeeService;
-        this.paySheetService = paySheetService;
-    }
 
     public byte[] generateWordProjectDocument(long id, HttpServletResponse response) throws IOException {
         if (id <= 0){

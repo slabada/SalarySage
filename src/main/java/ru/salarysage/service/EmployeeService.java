@@ -1,5 +1,6 @@
 package ru.salarysage.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.EmployeeDTO;
@@ -19,17 +20,12 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeService {
+
     protected final EmployeeRepository employeeRepository;
     protected final PositionRepository positionRepository;
     protected final GenericMapper genericMapper;
-    public EmployeeService(EmployeeRepository employeeRepository,
-                           PositionRepository positionRepository,
-                           GenericMapper genericMapper) {
-        this.employeeRepository = employeeRepository;
-        this.positionRepository = positionRepository;
-        this.genericMapper = genericMapper;
-    }
 
     public EmployeeDTO create(EmployeeModel e){
         Optional<PositionModel> p = positionRepository.findById(e.getPosition().getId());

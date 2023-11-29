@@ -1,28 +1,22 @@
 package ru.salarysage.controllers;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.models.TimeSheetModel;
-//import ru.salarysage.service.DocumentsService;
 import ru.salarysage.service.TimeSheetService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/timesheet")
+@RequiredArgsConstructor
 public class TimeSheetController {
 
     protected final TimeSheetService timeSheetService;
-
-    public TimeSheetController(TimeSheetService timeSheetService) {
-        this.timeSheetService = timeSheetService;
-    }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)

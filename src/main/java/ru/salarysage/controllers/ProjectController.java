@@ -1,24 +1,21 @@
 package ru.salarysage.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.salarysage.dto.ProjectDTO;
 import ru.salarysage.models.ProjectModel;
-import ru.salarysage.service.DocumentsService;
 import ru.salarysage.service.ProjectService;
 
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/project")
+@RequiredArgsConstructor
 public class ProjectController {
 
     protected final ProjectService projectService;
-
-    public ProjectController(ProjectService projectService) {
-        this.projectService = projectService;
-    }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)

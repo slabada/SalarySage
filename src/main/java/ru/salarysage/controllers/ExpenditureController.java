@@ -1,8 +1,8 @@
 package ru.salarysage.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.salarysage.dto.ExpenditureDTO;
 import ru.salarysage.models.ExpenditureModel;
@@ -12,13 +12,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/expenditure")
+@RequiredArgsConstructor
 public class ExpenditureController {
 
     protected final ExpenditureService expenditureService;
-
-    public ExpenditureController(ExpenditureService expenditureService) {
-        this.expenditureService = expenditureService;
-    }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)

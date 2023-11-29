@@ -1,6 +1,7 @@
 package ru.salarysage.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.salarysage.dto.RateDTO;
@@ -11,13 +12,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/rate")
+@RequiredArgsConstructor
 public class RateController {
 
     protected final RateService rateService;
-
-    public RateController(RateService rateService) {
-        this.rateService = rateService;
-    }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)

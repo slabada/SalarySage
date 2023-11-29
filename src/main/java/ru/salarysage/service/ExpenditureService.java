@@ -1,5 +1,6 @@
 package ru.salarysage.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.ExpenditureDTO;
 import ru.salarysage.exception.ExpenditureException;
@@ -15,14 +16,11 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class ExpenditureService {
+
     protected final ExpenditureRepository expenditureRepository;
     protected final GenericMapper genericMapper;
-    public ExpenditureService(ExpenditureRepository expenditureRepository,
-                              GenericMapper genericMapper) {
-        this.expenditureRepository = expenditureRepository;
-        this.genericMapper = genericMapper;
-    }
 
     public ExpenditureDTO create(ExpenditureModel e){
         boolean eDb = expenditureRepository.existsByName(e.getName());

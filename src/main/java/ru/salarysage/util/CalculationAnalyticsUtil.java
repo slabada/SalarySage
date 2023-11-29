@@ -1,12 +1,11 @@
 package ru.salarysage.util;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.salarysage.controllers.ProjectController;
 import ru.salarysage.dto.ExpenditureDTO;
 import ru.salarysage.dto.ProjectDTO;
 import ru.salarysage.exception.ProjectException;
-import ru.salarysage.models.ExpenditureModel;
-import ru.salarysage.models.ProjectModel;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,13 +14,10 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class CalculationAnalyticsUtil {
 
     protected final ProjectController projectController;
-
-    public CalculationAnalyticsUtil(ProjectController projectController) {
-        this.projectController = projectController;
-    }
 
     public BigDecimal calculationTotal(long id){
         // Ищем проект по id

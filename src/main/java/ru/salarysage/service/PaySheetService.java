@@ -1,5 +1,6 @@
 package ru.salarysage.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.PaySheetDTO;
 import ru.salarysage.dto.TimeSheetDTO;
@@ -21,31 +22,16 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class PaySheetService {
+
     protected final PaySheetRepository paySheetRepository;
     protected final EmployeeRepository employeeRepository;
     protected final RateService rateService;
     protected final BenefitService benefitService;
     protected final TimeSheetService timeSheetService;
     protected final CalculationUtil calculationUtil;
-
     protected final GenericMapper genericMapper;
-
-    public PaySheetService(PaySheetRepository paySheetRepository,
-                           EmployeeRepository employeeRepository,
-                           RateService rateService,
-                           BenefitService benefitService,
-                           TimeSheetService timeSheetService,
-                           CalculationUtil calculationUtil,
-                           GenericMapper genericMapper) {
-        this.paySheetRepository = paySheetRepository;
-        this.employeeRepository = employeeRepository;
-        this.rateService = rateService;
-        this.benefitService = benefitService;
-        this.timeSheetService = timeSheetService;
-        this.calculationUtil = calculationUtil;
-        this.genericMapper = genericMapper;
-    }
 
     public PaySheetDTO create(PaySheetModel ps){
         Optional<EmployeeModel> e = employeeRepository.findById(ps.getEmployeeId().getId());

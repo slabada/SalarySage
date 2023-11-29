@@ -1,5 +1,6 @@
 package ru.salarysage.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.TimeSheetDTO;
 import ru.salarysage.exception.EmployeeException;
@@ -16,18 +17,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class TimeSheetService {
+
     protected final TimeSheetRepository timeSheetRepository;
     protected final EmployeeRepository employeeRepository;
-
     protected final GenericMapper genericMapper;
-    public TimeSheetService(TimeSheetRepository timeSheetRepository,
-                            EmployeeRepository employeeRepository,
-                            GenericMapper genericMapper) {
-        this.timeSheetRepository = timeSheetRepository;
-        this.employeeRepository = employeeRepository;
-        this.genericMapper = genericMapper;
-    }
 
     public TimeSheetDTO create(TimeSheetModel t){
         boolean tDb = timeSheetRepository.existsByDateAndEmployeeId(t.getDate(), t.getEmployeeId());

@@ -1,6 +1,7 @@
 package ru.salarysage.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.salarysage.dto.BenefitDTO;
@@ -11,13 +12,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/benefit")
+@RequiredArgsConstructor
 public class BenefitController {
 
     protected final BenefitService benefitService;
-
-    public BenefitController(BenefitService benefitService) {
-        this.benefitService = benefitService;
-    }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)

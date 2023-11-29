@@ -1,6 +1,7 @@
 package ru.salarysage.controllers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.salarysage.dto.PaySheetDTO;
@@ -12,13 +13,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/paysheet")
+@RequiredArgsConstructor
 public class PaySheetController {
 
     protected final PaySheetService paySheetService;
-
-    public PaySheetController(PaySheetService paySheetService) {
-        this.paySheetService = paySheetService;
-    }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
