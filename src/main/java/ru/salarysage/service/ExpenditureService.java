@@ -79,7 +79,6 @@ public class ExpenditureService {
                     .map(ExpenditureModel::getId)
                     .toList();
             List<ExpenditureModel> bDb = expenditureRepository.findAllById(b);
-
             result.addAll(bDb);
         }
         return result;

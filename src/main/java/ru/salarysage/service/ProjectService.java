@@ -48,9 +48,6 @@ public class ProjectService {
         }
         Set<ExpenditureModel> exDb = expenditureService.check(p);
         p.setExpenditure(exDb);
-        if(exDb.isEmpty()){
-            throw new ExpenditureException.NoExpenditure();
-        }
         if(p.getStartDate() == null){
             p.setStartDate(LocalDate.now());
         }
@@ -96,9 +93,6 @@ public class ProjectService {
         }
         Set<ExpenditureModel> exDb = expenditureService.check(p);
         p.setExpenditure(exDb);
-        if(exDb.isEmpty()){
-            throw new ExpenditureException.NoExpenditure();
-        }
         p.setId(id);
         ProjectModel save = projectRepository.save(p);
         ProjectDTO pDTO = genericMapper.convertToDto(save, ProjectDTO.class);
