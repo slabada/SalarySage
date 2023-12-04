@@ -3,7 +3,6 @@ package ru.salarysage.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.ExpenditureDTO;
-import ru.salarysage.exception.BenefitException;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.mapper.GenericMapper;
@@ -36,7 +35,7 @@ public class ExpenditureService {
             throw new GeneraleException.InvalidIdException();
         }
         ExpenditureModel eDb = expenditureRepository.findById(id)
-                .orElseThrow(ExpenditureException.NoExpenditure::new);;
+                .orElseThrow(ExpenditureException.NoExpenditure::new);
         ExpenditureDTO eDTO = genericMapper.convertToDto(eDb, ExpenditureDTO.class);
         return Optional.of(eDTO);
     }
@@ -44,10 +43,8 @@ public class ExpenditureService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ExpenditureModel> eDb = expenditureRepository.findById(id);
-        if(eDb.isEmpty()){
-            throw new ExpenditureException.NoExpenditure();
-        }
+        expenditureRepository.findById(id)
+                .orElseThrow(ExpenditureException.NoExpenditure::new);
         boolean nDb = expenditureRepository.existsByNameAndIdNot(e.getName(), id);
         if(nDb){
             throw new ExpenditureException.ConflictName();
@@ -60,10 +57,8 @@ public class ExpenditureService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ExpenditureModel> eDb = expenditureRepository.findById(id);
-        if(eDb.isEmpty()){
-            throw new ExpenditureException.NoExpenditure();
-        }
+        expenditureRepository.findById(id)
+                .orElseThrow(ExpenditureException.NoExpenditure::new);
         expenditureRepository.deleteById(id);
     }
     // Метод для проверки доп затрат, связанных с проектом.

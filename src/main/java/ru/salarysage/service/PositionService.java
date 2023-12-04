@@ -30,7 +30,7 @@ public class PositionService {
             throw new GeneraleException.InvalidIdException();
         }
         PositionModel p = positionRepository.findById(id)
-                .orElseThrow(PositionException.PositionNotFoundException::new);;
+                .orElseThrow(PositionException.PositionNotFoundException::new);
         PositionDTO pDTO = genericMapper.convertToDto(p,PositionDTO.class);
         return Optional.of(pDTO);
     }
@@ -38,10 +38,8 @@ public class PositionService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PositionModel> pDb = positionRepository.findById(id);
-        if (pDb.isEmpty()){
-            throw new PositionException.PositionNotFoundException();
-        }
+        positionRepository.findById(id)
+                .orElseThrow(PositionException.PositionNotFoundException::new);
         boolean nDb = positionRepository.existsByNameAndIdNot(p.getName(), id);
         if(nDb){
             throw new PositionException.PositionAlreadyExistsException();
@@ -54,10 +52,8 @@ public class PositionService {
         if (id <= 0) {
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PositionModel> Delete = positionRepository.findById(id);
-        if (Delete.isEmpty()){
-            throw new PositionException.PositionNotFoundException();
-        }
+        positionRepository.findById(id)
+                .orElseThrow(PositionException.PositionNotFoundException::new);
         positionRepository.deleteById(id);
     }
 }

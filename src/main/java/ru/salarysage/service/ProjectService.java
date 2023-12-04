@@ -49,7 +49,7 @@ public class ProjectService {
             throw new GeneraleException.InvalidIdException();
         }
         ProjectModel p = projectRepository.findById(id)
-                .orElseThrow(ProjectException.NoProject::new);;
+                .orElseThrow(ProjectException.NoProject::new);
         Set<EmployeeModel> emDb = employeeService.check(p);
         if(emDb.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
@@ -65,10 +65,8 @@ public class ProjectService {
         if(id <= 0) {
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ProjectModel> pDb = projectRepository.findById(id);
-        if(pDb.isEmpty()) {
-            throw new ProjectException.NoProject();
-        }
+        projectRepository.findById(id)
+                .orElseThrow(ProjectException.NoProject::new);
         boolean nDb = projectRepository.existsByNameAndIdNot(p.getName(), id);
         if(nDb){
             throw new ProjectException.ConflictName();
@@ -88,10 +86,8 @@ public class ProjectService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ProjectModel> p = projectRepository.findById(id);
-        if(p.isEmpty()){
-            throw new ProjectException.NoProject();
-        }
+        projectRepository.findById(id)
+                .orElseThrow(ProjectException.NoProject::new);
         projectRepository.deleteById(id);
     }
 }

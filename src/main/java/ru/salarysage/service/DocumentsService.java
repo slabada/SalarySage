@@ -16,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,16 +40,13 @@ public class DocumentsService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ProjectDTO> p = projectService.get(id);
-        if (p.isEmpty()) {
-            throw new ProjectException.NoProject();
-        }
+        ProjectDTO p = projectService.get(id).orElseThrow(ProjectException.NoProject::new);
         // Создание объекта XWPFDocument, представляющего Word документ
         XWPFDocument document = new XWPFDocument();
         // Генерация содержимого документа: информация о проекте, участниках разработки, дополнительные расходы
-        createProjectInfo(document, p.get(), id);
-        createDevelopersTable(document, p.get());
-        createExpenditureTable(document, p.get());
+        createProjectInfo(document, p, id);
+        createDevelopersTable(document, p);
+        createExpenditureTable(document, p);
         // Преобразование документа в массив байт
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         document.write(byteArrayOutputStream);
@@ -146,16 +142,14 @@ public class DocumentsService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ProjectDTO> p = projectService.get(id);
-        if (p.isEmpty()) {
-            throw new ProjectException.NoProject();
-        }
+        ProjectDTO p = projectService.get(id)
+                .orElseThrow(ProjectException.NoProject::new);
         // Создание объекта Workbook, представляющего Excel документ
         Workbook workbook = new XSSFWorkbook();
         // Генерация содержимого документа: информация о проекте, участниках разработки, дополнительные расходы
-        createExcelProjectInfo(id, workbook, p.get());
-        createExcelDevelopersSheet(workbook, p.get());
-        createExcelExpenditureSheet(workbook, p.get());
+        createExcelProjectInfo(id, workbook, p);
+        createExcelDevelopersSheet(workbook, p);
+        createExcelExpenditureSheet(workbook, p);
         // Преобразование документа в массив байт
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         workbook.write(byteArrayOutputStream);
@@ -231,14 +225,12 @@ public class DocumentsService {
         if (t.isEmpty()){
             throw new TimeSheetException.NullTimeSheetException();
         }
-        Optional<EmployeeDTO> e = employeeService.get(id);
-        if(e.isEmpty()){
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
+        EmployeeDTO e = employeeService.get(id)
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         // Создание объекта XWPFDocument, представляющего Word документ
         XWPFDocument document = new XWPFDocument();
         // Генерация содержимого документа: информация о проекте, участниках разработки, дополнительные расходы
-        createTimeSheetTable(document, t, e.get());
+        createTimeSheetTable(document, t, e);
         // Преобразование документа в массив байт
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         document.write(byteArrayOutputStream);
@@ -293,14 +285,12 @@ public class DocumentsService {
         if (t.isEmpty()){
             throw new TimeSheetException.NullTimeSheetException();
         }
-        Optional<EmployeeDTO> e = employeeService.get(id);
-        if(e.isEmpty()){
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
+        EmployeeDTO e = employeeService.get(id)
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         // Создание нового Excel документа
         Workbook workbook = new XSSFWorkbook();
         // Генерация содержимого документа: информация о проекте, участниках разработки, дополнительные расходы
-        createTimeSheetSheet(workbook, t, e.get());
+        createTimeSheetSheet(workbook, t, e);
         // Преобразование документа в массив байт
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         workbook.write(byteArrayOutputStream);
@@ -347,14 +337,12 @@ public class DocumentsService {
         if (p.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
-        Optional<EmployeeDTO> e = employeeService.get(id);
-        if(e.isEmpty()){
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
+        EmployeeDTO e = employeeService.get(id)
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         // Создание объекта XWPFDocument, представляющего Word документ
         XWPFDocument document = new XWPFDocument();
         // Генерация содержимого документа: информация о проекте, участниках разработки, дополнительные расходы
-        createPaySheetTable(document, p, e.get());
+        createPaySheetTable(document, p, e);
         // Преобразование документа в массив байт
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         document.write(byteArrayOutputStream);
@@ -421,14 +409,12 @@ public class DocumentsService {
         if (p.isEmpty()){
             throw new PaySheetException.PaySheetNotFount();
         }
-        Optional<EmployeeDTO> e = employeeService.get(id);
-        if(e.isEmpty()){
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
+        EmployeeDTO e = employeeService.get(id)
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         // Создание нового Excel документа
         Workbook workbook = new XSSFWorkbook();
         // Генерация содержимого документа: информация о проекте, участниках разработки, дополнительные расходы
-        createExcelPaySheet(workbook, p, e.get());
+        createExcelPaySheet(workbook, p, e);
         // Преобразование документа в массив байт
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         workbook.write(byteArrayOutputStream);

@@ -28,11 +28,9 @@ public class EmployeeService {
     protected final GenericMapper genericMapper;
 
     public EmployeeDTO create(EmployeeModel e){
-        Optional<PositionModel> p = positionRepository.findById(e.getPosition().getId());
-        if(p.isEmpty()){
-            throw new PositionException.PositionNotFoundException();
-        }
-        e.setPosition(p.get());
+        PositionModel p = positionRepository.findById(e.getPosition().getId())
+                .orElseThrow(PositionException.PositionNotFoundException::new);
+        e.setPosition(p);
         EmployeeModel save = employeeRepository.save(e);
         return genericMapper.convertToDto(save, EmployeeDTO.class);
     }
@@ -49,16 +47,12 @@ public class EmployeeService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<EmployeeModel> eDb = employeeRepository.findById(id);
-        if(eDb.isEmpty()){
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
-        Optional<PositionModel> pDb = positionRepository.findById(e.getPosition().getId());
-        if(pDb.isEmpty()){
-            throw new PositionException.PositionNotFoundException();
-        }
+        employeeRepository.findById(id)
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
+        PositionModel pDb = positionRepository.findById(e.getPosition().getId())
+                .orElseThrow(PositionException.PositionNotFoundException::new);
         e.setId(id);
-        e.setPosition(pDb.get());
+        e.setPosition(pDb);
         EmployeeModel save = employeeRepository.save(e);
         return genericMapper.convertToDto(save, EmployeeDTO.class);
     }
@@ -66,10 +60,8 @@ public class EmployeeService {
         if(id <= 0) {
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<EmployeeModel> e = employeeRepository.findById(id);
-        if(e.isEmpty()) {
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
+        employeeRepository.findById(id)
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         employeeRepository.deleteById(id);
     }
     public List<EmployeeDTO> search(EmployeeModel e, int from, int size){

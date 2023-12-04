@@ -29,11 +29,9 @@ public class TimeSheetService {
         if(tDb){
             throw new TimeSheetException.DateException();
         }
-        Optional<EmployeeModel> e = employeeRepository.findById(t.getEmployeeId().getId());
-        if(e.isEmpty()){
-            throw new  EmployeeException.EmployeeNotFoundException();
-        }
-        t.setEmployeeId(e.get());
+        EmployeeModel e = employeeRepository.findById(t.getEmployeeId().getId())
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
+        t.setEmployeeId(e);
         TimeSheetModel save = timeSheetRepository.save(t);
         return genericMapper.convertToDto(save, TimeSheetDTO.class);
     }
@@ -50,20 +48,16 @@ public class TimeSheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<TimeSheetModel> tDb = timeSheetRepository.findById(id);
-        if(tDb.isEmpty()){
-            throw new TimeSheetException.NullTimeSheetException();
-        }
+        timeSheetRepository.findById(id)
+                .orElseThrow(TimeSheetException.NullTimeSheetException::new);
         boolean dDb = timeSheetRepository.existsByDateAndEmployeeIdAndIdNot(t.getDate(), t.getEmployeeId(), id);
         if(dDb){
             throw new TimeSheetException.DateException();
         }
-        Optional<EmployeeModel> e = employeeRepository.findById(t.getEmployeeId().getId());
-        if(e.isEmpty()){
-            throw new  EmployeeException.EmployeeNotFoundException();
-        }
+        EmployeeModel e = employeeRepository.findById(t.getEmployeeId().getId())
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         t.setId(id);
-        t.setEmployeeId(e.get());
+        t.setEmployeeId(e);
         TimeSheetModel save = timeSheetRepository.save(t);
         return genericMapper.convertToDto(save, TimeSheetDTO.class);
     }
@@ -71,10 +65,8 @@ public class TimeSheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<TimeSheetModel> tDb = timeSheetRepository.findById(id);
-        if(tDb.isEmpty()){
-            throw new TimeSheetException.NullTimeSheetException();
-        }
+        timeSheetRepository.findById(id)
+                .orElseThrow(TimeSheetException.NullTimeSheetException::new);
         timeSheetRepository.deleteById(id);
     }
     public List<TimeSheetDTO> searchByYearAndMonth(long id, Integer year, Byte month){
@@ -87,10 +79,8 @@ public class TimeSheetService {
         if(month == null){
             month = (byte) LocalDate.now().getMonth().getValue();
         }
-        Optional<EmployeeModel> e = employeeRepository.findById(id);
-        if(e.isEmpty()){
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
+        employeeRepository.findById(id)
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         // Поиск записей о рабочем времени для данного сотрудника, года и месяца.
         List<TimeSheetModel> t = timeSheetRepository.findAllByYearAndMonth(year, month, id);
         if(t.isEmpty()) {

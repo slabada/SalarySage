@@ -34,11 +34,9 @@ public class PaySheetService {
     protected final GenericMapper genericMapper;
 
     public PaySheetDTO create(PaySheetModel ps){
-        Optional<EmployeeModel> e = employeeRepository.findById(ps.getEmployeeId().getId());
-        if(e.isEmpty()){
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
-        ps.setEmployeeId(e.get());
+        EmployeeModel e = employeeRepository.findById(ps.getEmployeeId().getId())
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
+        ps.setEmployeeId(e);
         // Поиск записей о рабочем времени для данного сотрудника и месяца.
         List<TimeSheetDTO> t = timeSheetService.searchByYearAndMonth(
                 ps.getEmployeeId().getId(),
@@ -57,7 +55,7 @@ public class PaySheetService {
         // Вычисление общей суммы для расчетного листка.
         BigDecimal total = calculationUtil.calculationTotal(
                 t,
-                e.get().getPosition(),
+                e.getPosition(),
                 ps
         );
         ps.setTotalAmount(total);
@@ -69,7 +67,7 @@ public class PaySheetService {
             throw new GeneraleException.InvalidIdException();
         }
         PaySheetModel ps = paySheetRepository.findById(id)
-                .orElseThrow(PaySheetException.PaySheetNotFount::new);;
+                .orElseThrow(PaySheetException.PaySheetNotFount::new);
         PaySheetDTO psDTO = genericMapper.convertToDto(ps, PaySheetDTO.class);
         return Optional.of(psDTO);
     }
@@ -77,15 +75,10 @@ public class PaySheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetModel> psDb = paySheetRepository.findById(id);
-        if(psDb.isEmpty()){
-            throw new PaySheetException.PaySheetNotFount();
-        }
-        Optional<EmployeeModel> e = employeeRepository.findById(ps.getEmployeeId().getId());
-        if(e.isEmpty()){
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
-        ps.setEmployeeId(new EmployeeModel(ps.getEmployeeId().getId()));
+        paySheetRepository.findById(id)
+                .orElseThrow(PaySheetException.PaySheetNotFount::new);
+        EmployeeModel e = employeeRepository.findById(ps.getEmployeeId().getId())
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         // Поиск записей о рабочем времени для данного сотрудника и месяца.
         List<TimeSheetDTO> t = timeSheetService.searchByYearAndMonth(
                 ps.getEmployeeId().getId(),
@@ -104,7 +97,7 @@ public class PaySheetService {
         // Вычисление общей суммы для расчетного листка.
         BigDecimal total = calculationUtil.calculationTotal(
                 t,
-                e.get().getPosition(),
+                e.getPosition(),
                 ps
         );
         ps.setId(id);
@@ -116,10 +109,8 @@ public class PaySheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetModel> ps = paySheetRepository.findById(id);
-        if(ps.isEmpty()){
-            throw new PaySheetException.PaySheetNotFount();
-        }
+       paySheetRepository.findById(id)
+               .orElseThrow(PaySheetException.PaySheetNotFount::new);
         paySheetRepository.deleteById(id);
     }
     public List<PaySheetDTO> getAll(long id){

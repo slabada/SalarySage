@@ -43,10 +43,8 @@ public class BenefitService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<BenefitModel> bDb = benefitRepository.findById(id);
-        if(bDb.isEmpty()){
-            throw new BenefitException.NullBenefitException();
-        }
+        benefitRepository.findById(id)
+                .orElseThrow(BenefitException.NullBenefitException::new);
         boolean nDb = benefitRepository.existsByNameAndIdNot(b.getName(), id);
         if(nDb){
             throw new BenefitException.BenefitAlreadyExistsException();
@@ -59,10 +57,7 @@ public class BenefitService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<BenefitModel> bDb = benefitRepository.findById(id);
-        if(bDb.isEmpty()){
-            throw new BenefitException.NullBenefitException();
-        }
+        benefitRepository.findById(id).orElseThrow(BenefitException.NullBenefitException::new);
         benefitRepository.deleteById(id);
     }
     // Метод для проверки льгот, связанных с расчетным листком.

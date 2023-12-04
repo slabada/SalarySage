@@ -43,10 +43,8 @@ public class RateService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<RateModel> rDb = rateRepository.findById(id);
-        if(rDb.isEmpty()){
-            throw new RateException.NullRateException();
-        }
+        rateRepository.findById(id)
+                .orElseThrow(RateException.NullRateException::new);
         boolean nBd = rateRepository.existsByNameAndIdNot(r.getName(), id);
         if(nBd){
             throw new RateException.RateAlreadyExistsException();
@@ -59,10 +57,8 @@ public class RateService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<RateModel> rDb = rateRepository.findById(id);
-        if(rDb.isEmpty()){
-            throw new RateException.NullRateException();
-        }
+        rateRepository.findById(id)
+                .orElseThrow(RateException.NullRateException::new);
         rateRepository.deleteById(id);
     }
     // Метод для проверки налога, связанных с расчетным листком.
