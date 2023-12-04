@@ -40,14 +40,8 @@ public class EmployeeService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<EmployeeModel> e = employeeRepository.findById(id);
-        if(e.isEmpty()) {
-            throw new EmployeeException.EmployeeNotFoundException();
-        }
-        Optional<PositionModel> p = positionRepository.findById(e.get().getPosition().getId());
-        if(p.isEmpty()){
-            throw new PositionException.PositionNotFoundException();
-        }
+        EmployeeModel e = employeeRepository.findById(id)
+                .orElseThrow(EmployeeException.EmployeeNotFoundException::new);
         EmployeeDTO eDTO = genericMapper.convertToDto(e, EmployeeDTO.class);
         return Optional.of(eDTO);
     }
