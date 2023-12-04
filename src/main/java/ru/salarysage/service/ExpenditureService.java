@@ -3,6 +3,7 @@ package ru.salarysage.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.salarysage.dto.ExpenditureDTO;
+import ru.salarysage.exception.BenefitException;
 import ru.salarysage.exception.ExpenditureException;
 import ru.salarysage.exception.GeneraleException;
 import ru.salarysage.mapper.GenericMapper;
@@ -34,10 +35,8 @@ public class ExpenditureService {
         if(id <= 0) {
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ExpenditureModel> eDb = expenditureRepository.findById(id);
-        if(eDb.isEmpty()){
-            throw new ExpenditureException.NoExpenditure();
-        }
+        ExpenditureModel eDb = expenditureRepository.findById(id)
+                .orElseThrow(ExpenditureException.NoExpenditure::new);;
         ExpenditureDTO eDTO = genericMapper.convertToDto(eDb, ExpenditureDTO.class);
         return Optional.of(eDTO);
     }

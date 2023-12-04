@@ -34,10 +34,8 @@ public class BenefitService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<BenefitModel> bDb = benefitRepository.findById(id);
-        if(bDb.isEmpty()){
-            throw new BenefitException.NullBenefitException();
-        }
+        BenefitModel bDb = benefitRepository.findById(id)
+                .orElseThrow(BenefitException.NullBenefitException::new);
         BenefitDTO bDTO = genericMapper.convertToDto(bDb, BenefitDTO.class);
         return Optional.of(bDTO);
     }

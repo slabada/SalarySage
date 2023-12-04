@@ -68,10 +68,8 @@ public class PaySheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PaySheetModel> ps = paySheetRepository.findById(id);
-        if(ps.isEmpty()) {
-            throw new PaySheetException.PaySheetNotFount();
-        }
+        PaySheetModel ps = paySheetRepository.findById(id)
+                .orElseThrow(PaySheetException.PaySheetNotFount::new);;
         PaySheetDTO psDTO = genericMapper.convertToDto(ps, PaySheetDTO.class);
         return Optional.of(psDTO);
     }

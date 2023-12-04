@@ -48,15 +48,13 @@ public class ProjectService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<ProjectModel> p = projectRepository.findById(id);
-        if(p.isEmpty()){
-            throw new ProjectException.NoProject();
-        }
-        Set<EmployeeModel> emDb = employeeService.check(p.get());
+        ProjectModel p = projectRepository.findById(id)
+                .orElseThrow(ProjectException.NoProject::new);;
+        Set<EmployeeModel> emDb = employeeService.check(p);
         if(emDb.isEmpty()){
             throw new EmployeeException.EmployeeNotFoundException();
         }
-        Set<ExpenditureModel> exDb = expenditureService.check(p.get());
+        Set<ExpenditureModel> exDb = expenditureService.check(p);
         if(exDb.isEmpty()){
             throw new ExpenditureException.NoExpenditure();
         }

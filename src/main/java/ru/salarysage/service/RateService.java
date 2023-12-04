@@ -34,10 +34,8 @@ public class RateService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<RateModel> r = rateRepository.findById(id);
-        if(r.isEmpty()){
-            throw new RateException.NullRateException();
-        }
+        RateModel r = rateRepository.findById(id)
+                .orElseThrow(RateException.NullRateException::new);
         RateDTO rDTO = genericMapper.convertToDto(r, RateDTO.class);
         return Optional.of(rDTO);
     }

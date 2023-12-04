@@ -29,10 +29,8 @@ public class PositionService {
         if (id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<PositionModel> p = positionRepository.findById(id);
-        if (p.isEmpty()){
-            throw new PositionException.PositionNotFoundException();
-        }
+        PositionModel p = positionRepository.findById(id)
+                .orElseThrow(PositionException.PositionNotFoundException::new);;
         PositionDTO pDTO = genericMapper.convertToDto(p,PositionDTO.class);
         return Optional.of(pDTO);
     }

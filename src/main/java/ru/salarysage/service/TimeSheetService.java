@@ -41,14 +41,8 @@ public class TimeSheetService {
         if(id <= 0){
             throw new GeneraleException.InvalidIdException();
         }
-        Optional<TimeSheetModel> t = timeSheetRepository.findById(id);
-        if(t.isEmpty()){
-            throw new TimeSheetException.NullTimeSheetException();
-        }
-        Optional<EmployeeModel> e = employeeRepository.findById(t.get().getEmployeeId().getId());
-        if(e.isEmpty()){
-            throw new  EmployeeException.EmployeeNotFoundException();
-        }
+        TimeSheetModel t = timeSheetRepository.findById(id)
+                .orElseThrow(TimeSheetException.NullTimeSheetException::new);
         TimeSheetDTO tDTO = genericMapper.convertToDto(t, TimeSheetDTO.class);
         return Optional.of(tDTO);
     }
